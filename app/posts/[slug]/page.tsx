@@ -9,6 +9,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
+import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { siteConfig } from "@/site.config";
+
 export async function generateStaticParams() {
   return await getAllPostSlugs();
 }
@@ -25,11 +28,18 @@ export async function generateMetadata({
     return {};
   }
 
+  const author = post._embedded?.author?.[0]?.name;
+  const featuredMedia = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
+
   return generateContentMetadata({
     title: post.title.rendered,
     description: stripHtml(post.excerpt.rendered),
     slug: post.slug,
     basePath: "posts",
+    publishedTime: post.date,
+    modifiedTime: post.modified,
+    author: author,
+    image: featuredMedia,
   });
 }
 
@@ -56,12 +66,28 @@ export default async function Page({
 
   return (
     <Section>
+      <ArticleJsonLd
+        title={post.title.rendered}
+        description={stripHtml(post.excerpt.rendered)}
+        url={`${siteConfig.site_domain}/posts/${post.slug}`}
+        image={featuredMedia?.source_url}
+        datePublished={post.date}
+        dateModified={post.modified}
+        authorName={author?.name}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "/" },
+          { name: "Insights & Dispatch", url: "/posts" },
+          { name: post.title.rendered, url: `/posts/${post.slug}` },
+        ]}
+      />
       <Container>
         <Prose>
           <h1>
             <span
-                dangerouslySetInnerHTML={{ __html: post.title.rendered }}
-              ></span>
+              dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+            ></span>
           </h1>
           <div className="flex justify-between items-center gap-4 text-sm mb-4">
             <h5>

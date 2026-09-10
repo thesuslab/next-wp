@@ -1,62 +1,77 @@
-import { Section, Container } from "@/components/craft";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
-import { mainMenu, contentMenu } from "@/menu.config";
-import { siteConfig } from "@/site.config";
-import Logo from "@/public/logo.svg";
-import Image from "next/image";
+import { navigation } from "@/menu.config";
 import Link from "next/link";
+import Image from "next/image";
 
 export function Footer() {
   return (
-    <footer>
-      <Section>
-        <Container className="grid md:grid-cols-[1.5fr_0.5fr_0.5fr] gap-12">
-          <div className="flex flex-col gap-6 not-prose">
-            <Link href="/">
-              <h3 className="sr-only">{siteConfig.site_name}</h3>
+    <footer className="border-t border-border/30">
+      {/* Main footer */}
+      <div className="max-w-[1400px] mx-auto px-6 sm:px-8 py-16 md:py-20">
+        <div className="grid md:grid-cols-[1fr_auto] gap-12 mb-16">
+          {/* Brand */}
+          <div>
+            <Link href="/" className="inline-block group" aria-label="Sustainability Lab Home">
               <Image
-                src={Logo}
-                alt="Logo"
-                className="dark:invert"
-                width={42}
-                height={26.44}
+                src="/logo-transparent.png"
+                alt="The Sustainability Lab"
+                width={200}
+                height={90}
+                className="h-14 w-auto object-contain mb-3 transition-opacity group-hover:opacity-85 dark:brightness-110"
               />
             </Link>
-            <p>{siteConfig.site_description}</p>
+            <p className="text-sm text-muted-foreground mt-1 max-w-sm font-mono text-xs">
+              Intelligence for a resilient future.
+            </p>
+            <Link
+              href="/our-story"
+              className="inline-flex items-center gap-1.5 text-xs font-mono text-bamboo hover:underline mt-3"
+            >
+              Read our story →
+            </Link>
           </div>
-          <div className="flex flex-col gap-2 text-sm">
-            <h5 className="font-medium text-base">Website</h5>
-            {Object.entries(mainMenu).map(([key, href]) => (
-              <Link
-                className="hover:underline underline-offset-4"
-                key={href}
-                href={href}
-              >
-                {key.charAt(0).toUpperCase() + key.slice(1)}
-              </Link>
-            ))}
-          </div>
-          <div className="flex flex-col gap-2 text-sm">
-            <h5 className="font-medium text-base">Blog</h5>
-            {Object.entries(contentMenu).map(([key, href]) => (
-              <Link
-                className="hover:underline underline-offset-4"
-                key={href}
-                href={href}
-              >
-                {key.charAt(0).toUpperCase() + key.slice(1)}
-              </Link>
-            ))}
-          </div>
-        </Container>
-        <Container className="border-t not-prose flex flex-col md:flex-row md:gap-2 gap-6 justify-between md:items-center">
           <ThemeToggle />
-          <p className="text-muted-foreground">
-            &copy; <a href="https://9d8.dev">9d8</a>. All rights reserved.
-            2025-present.
-          </p>
-        </Container>
-      </Section>
+        </div>
+
+        {/* Navigation links */}
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-3 mb-16">
+          <Link
+            href="/our-story"
+            className="text-[11px] font-display font-bold tracking-[0.15em] uppercase text-bamboo hover:text-bamboo-light transition-colors duration-200"
+          >
+            Our Story
+          </Link>
+          {navigation.map((section) => (
+            <Link
+              key={section.href}
+              href={section.href}
+              className="text-[11px] font-display font-medium tracking-[0.15em] uppercase text-muted-foreground hover:text-bamboo transition-colors duration-200"
+            >
+              {section.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-border/20 pt-10">
+          <div className="grid md:grid-cols-[1fr_auto] gap-8 items-end">
+            <div>
+              <p className="text-sm text-muted-foreground/60 mb-1">
+                Research. Experiment. Collaborate. Build.
+              </p>
+              <p className="text-xs text-muted-foreground/40">
+                Kathmandu, Nepal
+              </p>
+              <p className="text-xs text-muted-foreground/40">
+                hello@sustainabilitylab.org
+              </p>
+            </div>
+            <p className="font-display text-sm text-bamboo font-medium italic">
+              Let&apos;s make the future less fragile.
+            </p>
+          </div>
+        </div>
+      </div>
     </footer>
   );
 }

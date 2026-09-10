@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 
 import type { Metadata } from "next";
 
+import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+
 // Revalidate pages every hour
 export const revalidate = 3600;
 
@@ -37,6 +39,8 @@ export async function generateMetadata({
     description,
     slug: page.slug,
     basePath: "pages",
+    publishedTime: page.date,
+    modifiedTime: page.modified,
   });
 }
 
@@ -54,9 +58,16 @@ export default async function Page({
 
   return (
     <Section>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "/" },
+          { name: "Pages", url: "/pages" },
+          { name: page.title.rendered, url: `/pages/${page.slug}` },
+        ]}
+      />
       <Container>
         <Prose>
-          <h2>{page.title.rendered}</h2>
+          <h1>{page.title.rendered}</h1>
           <div dangerouslySetInnerHTML={{ __html: page.content.rendered }} />
         </Prose>
       </Container>

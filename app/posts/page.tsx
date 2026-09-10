@@ -22,12 +22,21 @@ import { PostCard } from "@/components/posts/post-card";
 import { FilterPosts } from "@/components/posts/filter";
 import { SearchInput } from "@/components/posts/search-input";
 
+import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { createPageMetadata } from "@/lib/metadata";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Blog Posts",
-  description: "Browse all our blog posts",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Field Notes & Dispatch Archive",
+  description:
+    "Explore field dispatches, technical research papers, and critical analysis from the Sustainability Lab researchers and fellows.",
+  path: "/posts",
+  keywords: [
+    "Sustainability Research Archive",
+    "Field Notes Nepal",
+    "Himalayan Climate Dispatches",
+  ],
+});
 
 export const dynamic = "auto";
 export const revalidate = 3600;
@@ -74,10 +83,16 @@ export default async function Page({
 
   return (
     <Section>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: "/" },
+          { name: "Field Notes & Dispatch Archive", url: "/posts" },
+        ]}
+      />
       <Container>
         <div className="space-y-8">
           <Prose>
-            <h2>All Posts</h2>
+            <h2>All Field Dispatches & Research Notes</h2>
             <p className="text-muted-foreground">
               {total} {total === 1 ? "post" : "posts"} found
               {search && " matching your search"}
