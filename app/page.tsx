@@ -4,7 +4,6 @@ import { ThreeDoorsSection } from "@/components/home/ThreeDoorsSection";
 import { IntelligenceEngineSection } from "@/components/home/IntelligenceEngineSection";
 import { ResilienceSection } from "@/components/home/ResilienceSection";
 import { EnterpriseSection } from "@/components/home/EnterpriseSection";
-import { KarvaSection } from "@/components/home/KarvaSection";
 import { PhysicalLabSection } from "@/components/home/PhysicalLabSection";
 import { CommunitySection } from "@/components/home/CommunitySection";
 import { PartnershipsSection } from "@/components/home/PartnershipsSection";
@@ -17,17 +16,12 @@ const HOME_FAQ_ITEMS = [
   {
     question: "What is the Sustainability Lab?",
     answer:
-      "The Sustainability Lab is an interdisciplinary research laboratory, environmental intelligence platform, and circular design studio based in Maharajgunj, Kathmandu Valley, Nepal. It bridges planetary environmental science, climate engineering, high-resolution spatial telemetry, circular craftsmanship (KĀRVA), and entrepreneurial incubation.",
+      "The Sustainability Lab is an interdisciplinary research laboratory, environmental intelligence platform, and circular design studio based in Maharajgunj, Kathmandu Valley, Nepal. It bridges planetary environmental science, climate engineering, high-resolution spatial telemetry, circular craftsmanship, and entrepreneurial incubation.",
   },
   {
     question: "Where is the Sustainability Lab located?",
     answer:
       "The Sustainability Lab's primary research station, material workshop, and community coworking hub are located in Maharajgunj, Kathmandu Valley, Nepal (Coordinates: 27.7408° N, 85.3365° E).",
-  },
-  {
-    question: "What is KĀRVA by the Sustainability Lab?",
-    answer:
-      "KĀRVA is the circular craftsmanship and materials research studio by the Sustainability Lab. It recovers century-old salvaged Sal timber, kiln bricks, and agricultural residues to create circular objects, research material provenance, and design low-carbon vernacular building solutions.",
   },
   {
     question: "What is the Lab Lens?",
@@ -63,10 +57,7 @@ export default function Home() {
       {/* 06 — Enterprise */}
       <EnterpriseSection />
 
-      {/* 07 — KĀRVA */}
-      <KarvaSection />
-
-      {/* 08 — The Physical Lab */}
+      {/* 07 — The Physical Lab */}
       <PhysicalLabSection />
 
       {/* 09 — Community */}
