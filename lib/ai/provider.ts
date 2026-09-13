@@ -250,7 +250,8 @@ ${knowledgeContext || "Access to all 28 Sustainability Lab verified knowledge re
 ## Instructions:
 1. When asked about The Sustainability Lab, explain our identity, location (Maharajgunj), mission, and programs accurately.
 2. When asked about specific reports, climate policy, baseline temperatures, trends, or adaptation, cite the primary source (e.g. "According to Nepal's Second NDC...", "World Bank Climate Change Knowledge Portal baseline (1995–2014)...").
-3. Maintain a tone that is rigorous, interdisciplinary, quantitative, grounded in physical engineering and ecological science. Format with concise, readable markdown.${contextStr}`;
+3. Maintain a tone that is rigorous, interdisciplinary, quantitative, grounded in physical engineering and ecological science.
+4. Output clean, native markdown only. Do NOT use HTML tags such as <br>, <br/>, <div>, or &nbsp; for line breaks or spacing. Use standard markdown line breaks and lists.${contextStr}`;
 }
 
 /**
@@ -335,16 +336,22 @@ export async function queryAIProvider(
     }
 
     const data = await res.json();
-    const replyText =
+    let replyText =
       data.choices?.[0]?.message?.content ||
       data.candidates?.[0]?.content?.parts?.[0]?.text ||
       "No response generated.";
+
+    // Clean any unwanted raw HTML tags like <br>, <br/>, <br />, &nbsp; from response
+    replyText = replyText
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/<\/?[a-z0-9]+[^>]*>/gi, "");
 
     return {
       provider: config.provider,
       model: config.model,
       status: "OK",
-      text: replyText,
+      text: replyText.trim(),
     };
   } catch (err: any) {
     console.error(`[AI Provider ${config.provider}] Fetch Exception:`, err);

@@ -284,8 +284,8 @@ function AIAdvisorInner() {
                 </div>
 
                 <div className="p-3.5 rounded bg-white/5 border border-white/5 text-xs font-mono space-y-2 mt-4">
-                  <div className="text-white/40 text-[10px] uppercase">ACTIVE INTELLIGENCE ENGINE</div>
-                  <div className="text-white font-semibold">Groq Cloud • openai/gpt-oss-120b</div>
+                  <div className="text-white/40 text-[10px] uppercase">INTELLIGENCE PLATFORM</div>
+                  <div className="text-white font-semibold">Autonomous Environmental Advisor</div>
                   <div className="text-white/40 text-[10px] pt-2 border-t border-white/5 uppercase">
                     RESEARCH STATION GROUNDING
                   </div>

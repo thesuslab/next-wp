@@ -121,20 +121,11 @@ export function LabLensHUD() {
                     SYSTEM CONFIDENCE: {activeContext.confidenceScore}%
                   </span>
 
-                  {/* Provider Connectivity Badge */}
-                  {aiStatus && (
-                    <span
-                      className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase flex items-center gap-1.5 ${
-                        aiStatus.provider === "simulation"
-                          ? "bg-white/5 border-white/10 text-white/60"
-                          : "bg-bamboo/20 border-bamboo text-bamboo-light"
-                      }`}
-                      title={aiStatus.statusMessage}
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-                      LLM: {aiStatus.provider.toUpperCase()} ({aiStatus.model})
-                    </span>
-                  )}
+                  {/* Station Intelligence Badge */}
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-bamboo/30 bg-bamboo/10 text-bamboo-light uppercase flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-bamboo animate-pulse" />
+                    LAB INTELLIGENCE ACTIVE
+                  </span>
                 </div>
 
                 <h3 className="text-xl sm:text-2xl font-medium tracking-tight text-white">
@@ -219,7 +210,7 @@ export function LabLensHUD() {
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-bamboo animate-ping" />
                     <span className="text-xs font-mono text-bamboo font-semibold uppercase tracking-wider">
-                      Live AI Synthesis • {aiStatus?.provider?.toUpperCase()}
+                      Environmental Intelligence Synthesis
                     </span>
                   </div>
                   <button
@@ -233,7 +224,7 @@ export function LabLensHUD() {
                 {isAiLoading ? (
                   <div className="flex items-center gap-3 py-4 text-xs font-mono text-bamboo">
                     <span className="w-4 h-4 border-2 border-bamboo border-t-transparent rounded-full animate-spin" />
-                    <span>Querying {aiStatus?.provider || "AI engine"} with page context & telemetry...</span>
+                    <span>Synthesizing environmental intelligence with page telemetry...</span>
                   </div>
                 ) : (
                   <div className="text-xs leading-relaxed text-white/90 whitespace-pre-line font-sans space-y-2">
@@ -287,7 +278,7 @@ export function LabLensHUD() {
 
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
                   <span className="text-[11px] font-mono text-white/40">
-                    ENGINE: {aiStatus?.provider || "AUTO"} • MAHARAJGUNJ STATION
+                    MAHARAJGUNJ RESEARCH STATION • 27.7408° N, 85.3365° E
                   </span>
 
                   <div className="flex gap-2">
