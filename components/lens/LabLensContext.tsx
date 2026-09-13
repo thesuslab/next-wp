@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
+import { getKnowledgeEntryBySlug } from "@/lib/knowledge/data";
 
 export interface LensMetric {
   label: string;
@@ -115,83 +116,131 @@ export function LabLensProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (pathname.startsWith("/intelligence/knowledge")) {
-      // Check if viewing a specific article
       const segments = pathname.split("/").filter(Boolean);
       const articleSlug = segments[2]; // /intelligence/knowledge/[slug]
       
       if (articleSlug) {
-        return {
-          title: "Knowledge Base Verification Ledger",
-          subtitle: `Article ID: ${articleSlug} • Primary Source Grounded`,
-          category: "VERIFIED EVIDENCE",
-          confidenceScore: 98,
-          metrics: [
-            { label: "EVIDENCE LEVEL", value: "PEER / UN / WB", status: "safe", details: "Ground-truth institutional data verification" },
-            { label: "CITATION AUDIT", value: "VERIFIED", status: "safe", details: "Direct link to primary source publication" },
-            { label: "AI GROUNDING", value: "SYNCHRONIZED", status: "safe", details: "Article text actively available to AI Advisor" },
-            { label: "METHODOLOGY", value: "SYSTEMATIC", status: "neutral", details: "Quantitative baseline & multi-scenario projections" },
-          ],
-          insights: [
-            "This report is registered in the Sustainability Lab verified ledger.",
-            "Ask Lab Lens or the AI Advisor to synthesize this data with your project parameters.",
-          ],
-        };
+        const article = getKnowledgeEntryBySlug(articleSlug);
+        if (article) {
+          const metrics: LensMetric[] = [
+            {
+              label: "EVIDENCE LEVEL",
+              value: article.source.level.toUpperCase(),
+              status: "safe",
+              details: `Authority: ${article.source.name}`,
+            },
+            {
+              label: "CITATION AUDIT",
+              value: "OFFICIAL",
+              status: "safe",
+              details: `Date: ${article.source.date} • ${article.source.type}`,
+            },
+            {
+              label: "GEOGRAPHIC SCOPE",
+              value: article.region.toUpperCase(),
+              status: "neutral",
+              details: `${article.locality ? `${article.locality}, ` : ""}${article.country}`,
+            },
+            {
+              label: "TOPIC / CATEGORY",
+              value: article.category.toUpperCase(),
+              status: "safe",
+              details: `Index Topic: ${article.topic}`,
+            },
+          ];
+
+          if (article.data?.temperatureMedianC !== undefined) {
+            metrics.push({
+              label: "TEMP PROJECTION",
+              value: `+${article.data.temperatureMedianC}°C`,
+              status: "warning",
+              details: `${article.data.scenario || "Scenario"} (${article.data.period || "2050"})`,
+            });
+          } else if (article.data?.temperatureChangeCPerDecade !== undefined) {
+            metrics.push({
+              label: "DECADAL WARMING",
+              value: `+${article.data.temperatureChangeCPerDecade}°C / dec`,
+              status: "warning",
+              details: "Observed trend since 1970 (ERA5)",
+            });
+          } else {
+            metrics.push({
+              label: "AI READINESS",
+              value: "RAG LOADED",
+              status: "safe",
+              details: "Full report text ready for interactive interrogation",
+            });
+          }
+
+          return {
+            title: article.title,
+            subtitle: `Source: ${article.source.name} (${article.source.date})`,
+            category: `VERIFIED REPORT • ${article.category.toUpperCase()}`,
+            confidenceScore: 100,
+            metrics,
+            insights: [
+              article.summary,
+              `Primary URL: ${article.source.url}`,
+            ],
+          };
+        }
       }
 
       return {
-        title: "Sustainability Lab Knowledge Base",
-        subtitle: "28 Grounded Reports • Evidence-First Environmental Intelligence",
+        title: "Sustainability Lab Knowledge Commons",
+        subtitle: "28 Sourced Research Reports & Baseline Assessments",
         category: "KNOWLEDGE COMMONS",
-        confidenceScore: 97,
+        confidenceScore: 100,
         metrics: [
-          { label: "TOTAL REPORTS", value: "28 INDEXED", status: "safe", details: "UNFCCC NDC, World Bank CCKP, ICIMOD, WHO, ADB" },
-          { label: "PRIMARY SOURCES", value: "100% SOURCED", status: "safe", details: "Zero speculative or unsourced claims" },
-          { label: "GEOGRAPHIC SCOPE", value: "HIMALAYAN / S. ASIA", status: "neutral", details: "Nepal national, river basins, & ecological zones" },
-          { label: "AI READINESS", value: "RAG EMBEDDED", status: "safe", details: "Full contextual querying enabled across catalog" },
+          { label: "INDEXED PAPERS", value: "28 REPORTS", status: "safe", details: "UNFCCC NDC, World Bank, ICIMOD, WHO, ADB" },
+          { label: "PRIMARY CITATIONS", value: "100% SOURCED", status: "safe", details: "All data cross-referenced to institutional releases" },
+          { label: "BASELINE PERIOD", value: "1995–2014 ERA5", status: "neutral", details: "Historical baseline 12.66°C, 2,042mm precip" },
+          { label: "PROJECTION HORIZONS", value: "2030 / 2050", status: "safe", details: "IPCC CMIP6 SSP1-2.6 to SSP3-7.0 pathways" },
+          { label: "AI ADVISOR", value: "SYNCHRONIZED", status: "safe", details: "Direct chat enabled for each document" },
         ],
         insights: [
-          "Browse by Category (Climate, Infrastructure, Policy, Enterprise) or Kind.",
-          "Select any article to interrogate its methodology and localized risk implications with the AI Advisor.",
+          "Browse reports by Category (Climate, Infrastructure, Policy, Enterprise) or Kind.",
+          "Select any report to interrogate its primary figures, methodologies, and localized adaptation guidance.",
         ],
       };
     }
 
     if (pathname.includes("/our-story") || pathname.includes("/lab")) {
       return {
-        title: "The Sustainability Lab • Maharajgunj Station",
-        subtitle: "Physical Station: 27.7408° N, 85.3365° E • Kathmandu Valley",
-        category: "INSTITUTIONAL IDENTITY",
-        confidenceScore: 99,
+        title: "The Sustainability Lab • Maharajgunj Research Station",
+        subtitle: "Station Coordinates: 27.7408° N, 85.3365° E • Kathmandu Valley",
+        category: "INSTITUTIONAL HEADQUARTERS",
+        confidenceScore: 100,
         metrics: [
-          { label: "HEADQUARTERS", value: "MAHARAJGUNJ, KTM", status: "safe", details: "Research station, workshop & testing commons" },
-          { label: "PILLARS", value: "3 DOORS", status: "safe", details: "Intelligence, Resilience, Enterprise (KĀRVA)" },
-          { label: "COMMONS NETWORK", value: "OPEN ACCESS", status: "safe", details: "Fellowships, residencies, and public data APIs" },
-          { label: "FOUNDATION", value: "NON-PROFIT / STUDIO", status: "neutral", details: "Hybrid research lab and regenerative venture studio" },
+          { label: "HEADQUARTERS", value: "MAHARAJGUNJ, KTM", status: "safe", details: "Physical station, workshop, and testing labs" },
+          { label: "DOOR 1: INTELLIGENCE", value: "ACTIVE", status: "safe", details: "28-article Knowledge Base, GIS layers, Risk Scanner" },
+          { label: "DOOR 2: RESILIENCE", value: "ACTIVE", status: "safe", details: "Watershed hydrology, GLOF and flood safeguarding" },
+          { label: "DOOR 3: ENTERPRISE", value: "KĀRVA STUDIO", status: "safe", details: "Circular craftsmanship, Sal timber, SME incubation" },
         ],
         insights: [
-          "Door 1 (Intelligence): GIS spatial telemetry, 28 knowledge base reports, climate scanner.",
-          "Door 2 (Resilience): Himalayan watershed hydrology, GLOF modeling, bio-engineering.",
+          "Door 1 (Intelligence): Real-time watershed GIS, 28 knowledge base reports, climate risk scanner.",
+          "Door 2 (Resilience): Himalayan watershed hydrology, GLOF modeling, bio-engineering slope stabilization.",
           "Door 3 (Enterprise): Circular craftsmanship studio (KĀRVA) and regenerative business diagnostics.",
         ],
       };
     }
 
-    // Default / Homepage / Intelligence
+    // Default / Homepage / Environmental Intelligence
     return {
-      title: "The Sustainability Lab • Environmental Intelligence",
-      subtitle: "Active Coordinates: 27.7408° N, 85.3365° E (Maharajgunj, Kathmandu)",
-      category: "EARTH TELEMETRY",
-      confidenceScore: 96,
+      title: "Environmental Intelligence Telemetry",
+      subtitle: "Maharajgunj Research Station • 27.7408° N, 85.3365° E (Kathmandu Valley)",
+      category: "WATERSHED & CLIMATE BASELINE",
+      confidenceScore: 98,
       metrics: [
-        { label: "ENVIRONMENT", value: "HIGH CONCERN", status: "alert", details: "Catchment runoff & topsoil erosion active" },
-        { label: "CLIMATE HAZARD", value: "ELEVATED", status: "warning", details: "Monsoon anomaly +18% variability" },
-        { label: "BIODIVERSITY INDEX", value: "76/100", status: "neutral", details: "Key wildlife corridors under pressure" },
-        { label: "COMMUNITY RESILIENCE", value: "MEDIUM", status: "warning", details: "Decentralized water storage required" },
-        { label: "INFRASTRUCTURE BUFFER", value: "MODERATE", status: "neutral", details: "Seismic retrofitting ongoing" },
+        { label: "HISTORICAL MEAN TEMP", value: "12.66 °C", status: "neutral", details: "World Bank CCKP baseline period (1995–2014)" },
+        { label: "ANNUAL PRECIPITATION", value: "2,042.3 mm", status: "neutral", details: "National climatological average (ERA5)" },
+        { label: "WARMING RATE", value: "+0.17 °C / dec", status: "warning", details: "Observed temperature trend across Nepal since 1970" },
+        { label: "MID-CENTURY PROJECTION", value: "+1.50 °C [SSP3-7.0]", status: "alert", details: "Median warming for 2040–2059 (1.10°C to 2.01°C range)" },
+        { label: "RESEARCH COMMONS", value: "28 REPORTS", status: "safe", details: "Verified evidence catalog ready for AI synthesis" },
       ],
       insights: [
-        "Intelligence telemetry refreshed from 42 satellite & in-situ hydrological nodes.",
-        "Model projection: Early intervention yields 4.2x disaster cost avoidance by 2030.",
+        "All metrics calibrated directly against World Bank CCKP (ERA5 reanalysis) and IPCC CMIP6 models.",
+        "Use the Ask Lab Lens prompt below to query localized adaptation measures for your site.",
       ],
     };
   }, [pathname]);

@@ -81,13 +81,41 @@ export default function CollaboratePage() {
   const [email, setEmail] = useState("");
   const [primaryDetails, setPrimaryDetails] = useState("");
   const [secondaryDetails, setSecondaryDetails] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const activeConfig = intentConfigs[activeIntent];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          intent: activeConfig.label,
+          name,
+          email,
+          primaryDetails,
+          secondaryDetails,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to submit project brief.");
+      }
+
+      setIsSubmitted(true);
+    } catch (err: any) {
+      setErrorMessage(err.message || "Something went wrong sending your brief. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -275,11 +303,25 @@ export default function CollaboratePage() {
                 </div>
               </div>
 
+              {errorMessage && (
+                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-xs font-mono text-destructive">
+                  {errorMessage}
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-data text-black font-mono font-bold text-xs uppercase tracking-wider hover:bg-data/90 transition-all shadow-lg hover:shadow-data/20"
+                disabled={isSubmitting}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-data text-black font-mono font-bold text-xs uppercase tracking-wider hover:bg-data/90 transition-all shadow-lg hover:shadow-data/20 disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                Submit Project Brief →
+                {isSubmitting ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    Transmitting to Directorate...
+                  </>
+                ) : (
+                  "Submit Project Brief →"
+                )}
               </button>
             </form>
           )}

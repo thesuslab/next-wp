@@ -20,125 +20,35 @@ const defaultConversations: Record<
   string,
   {
     title: string;
-    sector: string;
-    stage: string;
-    corridor: string;
-    horizon: string;
-    messages: Message[];
-    nextSteps: string[];
-    templates: string[];
-    mentors: string[];
+    description: string;
+    suggestedPrompts: string[];
   }
 > = {
-  lab: {
-    title: "The Sustainability Lab • Institutional Grounding",
-    sector: "Environmental Science & Climate Engineering",
-    stage: "Research & Deployment",
-    corridor: "Kathmandu Valley (Maharajgunj)",
-    horizon: "Operational Baseline",
-    messages: [
-      {
-        role: "user",
-        content: "What is The Sustainability Lab and what does it actually do?",
-        time: "10:15 AM",
-      },
-      {
-        role: "lab",
-        content:
-          "The Sustainability Lab is an interdisciplinary environmental intelligence institute, climate engineering laboratory, and circular design studio headquartered at the Maharajgunj Research Station in Kathmandu Valley (27.7408° N, 85.3365° E).\n\nWe operate across three core institutional doors:\n\n1. **Door 1: Intelligence & Open Knowledge Hub** (/intelligence)\n   - High-resolution spatial telemetry, river catchment GIS, and IPCC 2030/2050 Climate Risk Scanner.\n   - Authoritative Knowledge Base of 28 source-grounded research reports and field guides based on UNFCCC Second NDC, World Bank CCKP, ICIMOD, WHO, and ADB.\n\n2. **Door 2: Resilience & Engineering** (/resilience)\n   - Himalayan watershed hydrology, Run-of-River hydropower lean-flow resilience, glacial lake outburst flood (GLOF) hazard modeling, and bio-engineering slope stabilization (vetiver, Alnus nepalensis).\n\n3. **Door 3: Enterprise & KĀRVA Studio** (/enterprise, /karva)\n   - KĀRVA: Circular craftsmanship studio recovering 80-100 year-old salvaged Shorea robusta (Sal) architectural timber, demolition bricks, and agricultural waste into architectural artifacts with zero-VOC finishes.\n   - Enterprise diagnostic tool and incubation for South Asian regenerative businesses.\n\nHow can our station and models assist your project or research today?",
-        time: "10:15 AM",
-      },
-    ],
-    nextSteps: [
-      "Explore the 28 Knowledge Base research reports.",
-      "Run the Climate Risk Scanner for local river basin projections.",
-      "Launch an Enterprise Diagnostic for circular business modeling.",
-    ],
-    templates: [
-      "Sustainability Lab Institutional Charter & Protocol (PDF)",
-      "Open Knowledge Commons Citation Guidelines",
-    ],
-    mentors: [
-      "Er. B. R. Joshi — Hydrological Hazard Specialist",
-      "Dr. S. Shakya — Industrial Bio-Materials & Fiber",
-      "N. Shrestha — Environmental Safeguards Lead",
+  general: {
+    title: "General Environmental & Lab Inquiries",
+    description: "Inquire about Maharajgunj station research, watershed resilience, climate risk scanner, or circular craftsmanship.",
+    suggestedPrompts: [
+      "What are the core research programs and facilities at Maharajgunj station?",
+      "How does the Sustainability Lab approach Himalayan watershed hydrology and GLOF risk?",
+      "What is KĀRVA Studio and how does it recover salvaged architectural timber?",
     ],
   },
-  packaging: {
-    title: "Circular Agri-Packaging Studio",
-    sector: "Circular Bio-Materials",
-    stage: "Pilot Feasibility",
-    corridor: "Chitwan Agro-Basin",
-    horizon: "Immediate 90-Day Deployment",
-    messages: [
-      {
-        role: "user",
-        content: "I want to start a sustainable packaging company using agricultural waste in Nepal.",
-        time: "10:24 AM",
-      },
-      {
-        role: "lab",
-        content:
-          "Let's first understand your customer economics and feedstock availability. In Nepal, paddy straw and bagasse represent huge seasonal biomass volumes, but decentralized collection logistics and moisture management typically drive 45% of total operating expenditure.\n\nHave you calculated your localized radius for raw material sourcing?",
-        time: "10:25 AM",
-      },
-      {
-        role: "user",
-        content: "We're looking at a 25km radius in the Chitwan agricultural corridor.",
-        time: "10:26 AM",
-      },
-      {
-        role: "lab",
-        content:
-          "That 25km radius keeps transport under $18/ton, which makes you cost-competitive against imported extruded polystyrene (thermocol). Next, you will need to determine whether you are pursuing thermoformed molded pulp or mycelium-bound packaging, as the capital expenditure for steam tooling versus biological curing chambers differs by 3.5x.",
-        time: "10:27 AM",
-      },
-    ],
-    nextSteps: [
-      "Map seasonal biomass availability in Chitwan district.",
-      "Compare Capex: Steam-pressed molded fiber vs mycelium bio-curing.",
-      "Conduct test pilot with 3 local e-commerce shippers.",
-    ],
-    templates: [
-      "Bio-Packaging Feedstock Mass Balance Model (Excel)",
-      "Food-Grade Barrier Coating Assessment Protocol (PDF)",
-    ],
-    mentors: [
-      "Dr. S. Shakya — Industrial Bio-Materials & Fiber",
-      "P. Adhikari — AgTech Supply Chain Logistics",
+  hydrology: {
+    title: "Himalayan Watershed Hydrology & Engineering",
+    description: "Analyze Run-of-River hydro safeguarding, lean-flow compliance, GLOF hazards, and bio-engineering.",
+    suggestedPrompts: [
+      "What are the e-flow requirements and lean-season risks for Himalayan hydro projects?",
+      "How are Alnus nepalensis and vetiver grass deployed for cut-slope stabilization?",
+      "What multi-hazard early warning systems are recommended for GLOF corridors?",
     ],
   },
-  eia: {
-    title: "Himalayan Run-of-River EIA Risk Matrix",
-    sector: "Renewable Energy & Water",
-    stage: "Detailed EIA Baseline",
-    corridor: "Trishuli River Watershed",
-    horizon: "Pre-Construction Review",
-    messages: [
-      {
-        role: "user",
-        content: "What environmental and social risks should we prioritize for a 25MW run-of-river hydro project?",
-        time: "11:15 AM",
-      },
-      {
-        role: "lab",
-        content:
-          "For a 25MW Himalayan run-of-river facility, the top three risk vectors are:\n1. River Connectivity & e-flow compliance during lean winter months.\n2. Upstream glacial hazard & flash-flood debris flow.\n3. Cut-slope spoil dumping and downstream irrigation impact.\n\nMultilateral lenders (ADB/WB) will require minimum 10-15% mean lean flow or species-specific depth velocity curves.",
-        time: "11:16 AM",
-      },
-    ],
-    nextSteps: [
-      "Calculate 10-day winter low-flow hydrology duration curves.",
-      "Perform GIS LiDAR slope angle stability assessment on powerhouse footprint.",
-      "Draft Free, Prior & Informed Consent (FPIC) stakeholder schedule.",
-    ],
-    templates: [
-      "Environmental Management Plan (EMP) Matrix Template",
-      "Aquatic Biodiversity Baseline Survey Standard",
-    ],
-    mentors: [
-      "Er. B. R. Joshi — Hydrological Hazard Specialist",
-      "N. Shrestha — Environmental Safeguard Lead",
+  circularity: {
+    title: "Circular Design, Biomaterials & KĀRVA Studio",
+    description: "Evaluate agricultural biomass recovery, salvaged Shorea robusta (Sal) timber, and low-carbon materials.",
+    suggestedPrompts: [
+      "What are the logistics and economics of agricultural waste (paddy straw/bagasse) in Nepal?",
+      "What are the mechanical and durability properties of salvaged 80-year Sal timber?",
+      "How do mycelium composites compare against expanded polystyrene in cold chain packaging?",
     ],
   },
 };
@@ -166,50 +76,13 @@ function AIAdvisorInner() {
     if (articleParam) {
       setActiveTab("knowledge");
       setSelectedArticleSlug(articleParam);
-      const art = getKnowledgeEntryBySlug(articleParam);
-      if (art) {
-        setMessages([
-          {
-            role: "user",
-            content: `I am reviewing "${art.title}". What are the critical findings, baseline metrics, and action requirements from this report?`,
-            time: "12:00 PM",
-          },
-          {
-            role: "lab",
-            content: `### Executive Intelligence Summary: "${art.title}"\n\n**Primary Authority:** ${art.source.name} (${art.source.date})\n**Geographic Focus:** ${art.region}${art.locality ? ` (${art.locality})` : ""}, ${art.country}\n**Evidence Classification:** ${art.source.level.toUpperCase()}\n\n**Summary:**\n${art.summary}\n\n${
-              art.data
-                ? `**Key Quantitative Telemetry:**\n- Scenario / Period: ${art.data.scenario || art.data.period || "Historical Baseline"}\n- Temperature Projection: +${art.data.temperatureMedianC ?? art.data.temperatureChangeCPerDecade ?? "N/A"}°C\n- Precipitation Metric: ${art.data.precipitationChangeMmPerDecade ? `+${art.data.precipitationChangeMmPerDecade} mm/decade` : "Monsoon Anomaly"}\n\n`
-                : ""
-            }You can now interrogate any specific aspect of this document, request localized risk implications, or cross-reference it against our regional hydrology and circularity models.`,
-            time: "12:00 PM",
-            sourceDoc: art.source.name,
-          },
-        ]);
-        return;
-      }
+      // Clean chat for specific article without pre-populated fake dialog
+      setMessages([]);
+      return;
     }
 
-    if (activeTab === "scenario") {
-      const scen = defaultConversations[activeScenario] || defaultConversations.lab;
-      setMessages(scen.messages);
-    } else {
-      const art = activeArticle || allArticles[0];
-      if (art) {
-        setMessages([
-          {
-            role: "user",
-            content: `Can you analyze the report "${art.title}" and explain its relevance to Nepal's climate and economic resilience?`,
-            time: "12:00 PM",
-          },
-          {
-            role: "lab",
-            content: `### Grounded Intelligence: "${art.title}"\n\n**Source Authority:** ${art.source.name} (${art.source.date})\n**Topic / Category:** ${art.topic} • ${art.category} [${art.source.level.toUpperCase()}]\n\n${art.summary}\n\nI have loaded the full evidence ledger for this report into memory. What specific parameters would you like to evaluate (e.g. baseline numbers, policy targets, mitigation costs, or regional adaptation protocols)?`,
-            time: "12:00 PM",
-            sourceDoc: art.source.name,
-          },
-        ]);
-      }
-    }
+    // Default clean state
+    setMessages([]);
   }, [activeTab, activeScenario, selectedArticleSlug, articleParam]);
 
   const handleSend = async (e: React.FormEvent) => {
@@ -389,7 +262,7 @@ function AIAdvisorInner() {
             ) : (
               <div className="space-y-4">
                 <div className="text-[10px] font-mono text-[#00D4AA] uppercase tracking-widest mb-4">
-                  01 • SELECT SCENARIO
+                  01 • SELECT DOMAIN
                 </div>
                 <div className="space-y-2">
                   {Object.entries(defaultConversations).map(([key, scen]) => (
@@ -403,24 +276,20 @@ function AIAdvisorInner() {
                       }`}
                     >
                       <div className="text-xs font-semibold">{scen.title}</div>
-                      <div className="text-[10px] font-mono text-white/50 mt-1">
-                        Sector: {scen.sector}
+                      <div className="text-[11px] text-white/50 mt-1 leading-relaxed">
+                        {scen.description}
                       </div>
                     </button>
                   ))}
                 </div>
 
-                <div className="p-3 rounded bg-white/5 border border-white/5 text-xs font-mono space-y-2 mt-4">
-                  <div className="text-white/40 text-[10px]">ACTIVE HORIZON</div>
-                  <div className="text-white font-semibold">
-                    {defaultConversations[activeScenario]?.horizon || "Immediate"}
+                <div className="p-3.5 rounded bg-white/5 border border-white/5 text-xs font-mono space-y-2 mt-4">
+                  <div className="text-white/40 text-[10px] uppercase">ACTIVE INTELLIGENCE ENGINE</div>
+                  <div className="text-white font-semibold">Groq Cloud • openai/gpt-oss-120b</div>
+                  <div className="text-white/40 text-[10px] pt-2 border-t border-white/5 uppercase">
+                    RESEARCH STATION GROUNDING
                   </div>
-                  <div className="text-white/40 text-[10px] pt-2 border-t border-white/5">
-                    REGIONAL CORRIDOR
-                  </div>
-                  <div className="text-white font-semibold">
-                    {defaultConversations[activeScenario]?.corridor || "Himalayan Watershed"}
-                  </div>
+                  <div className="text-white font-semibold">Maharajgunj (27.7408° N, 85.3365° E)</div>
                 </div>
               </div>
             )}
@@ -434,23 +303,96 @@ function AIAdvisorInner() {
                 <span className="text-[#00D4AA]">●</span>
                 <span className="text-white/80 truncate max-w-md font-medium">
                   {activeTab === "knowledge" && activeArticle
-                    ? `Grounding: ${activeArticle.title}`
+                    ? `Active Grounding: ${activeArticle.title}`
                     : defaultConversations[activeScenario]?.title}
                 </span>
               </div>
-              {activeTab === "knowledge" && activeArticle && (
-                <Link
-                  href={`/intelligence/knowledge/${activeArticle.slug}`}
-                  target="_blank"
-                  className="text-[11px] text-[#00D4AA] hover:underline flex items-center gap-1"
-                >
-                  View Full Report ↗
-                </Link>
-              )}
+              <div className="flex items-center gap-3">
+                {messages.length > 0 && (
+                  <button
+                    onClick={() => setMessages([])}
+                    className="text-[11px] text-white/50 hover:text-white transition-colors"
+                  >
+                    Clear Chat ✕
+                  </button>
+                )}
+                {activeTab === "knowledge" && activeArticle && (
+                  <Link
+                    href={`/intelligence/knowledge/${activeArticle.slug}`}
+                    target="_blank"
+                    className="text-[11px] text-[#00D4AA] hover:underline flex items-center gap-1"
+                  >
+                    View Full Report ↗
+                  </Link>
+                )}
+              </div>
             </div>
 
             {/* Conversation Stream */}
             <div className="flex-1 overflow-y-auto space-y-4 pr-2 mb-4 max-h-[500px]">
+              {messages.length === 0 && (
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 my-auto text-white/60">
+                  <div className="w-10 h-10 rounded-full bg-[#00D4AA]/10 border border-[#00D4AA]/30 flex items-center justify-center text-[#00D4AA] mb-4 text-base">
+                    ✦
+                  </div>
+                  <h3 className="text-sm font-semibold text-white mb-1">
+                    {activeTab === "knowledge" && activeArticle
+                      ? `Inquire about "${activeArticle.title}"`
+                      : "Autonomous Environmental Intelligence Advisor"}
+                  </h3>
+                  <p className="text-xs text-white/50 max-w-md mb-6 leading-relaxed">
+                    {activeTab === "knowledge" && activeArticle
+                      ? `This report is published by ${activeArticle.source.name} (${activeArticle.source.date}). Ask about specific quantitative projections, policy mandates, or implementation barriers.`
+                      : "Pose any question regarding watershed hydrology, climate risk projections, circular material engineering, or project compliance."}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 justify-center max-w-lg">
+                    {activeTab === "knowledge" && activeArticle ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setInputVal(`What are the key baseline figures and projected changes in "${activeArticle.title}"?`);
+                          }}
+                          className="text-left text-[11px] font-mono p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 transition-colors"
+                        >
+                          "What are the key baseline figures and projections?"
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setInputVal(`How does this report relate to Nepal's climate policy and adaptation targets?`);
+                          }}
+                          className="text-left text-[11px] font-mono p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 transition-colors"
+                        >
+                          "How does this relate to Nepal's climate policy?"
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setInputVal("What are the primary operational programs at the Maharajgunj Research Station?");
+                          }}
+                          className="text-left text-[11px] font-mono p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 transition-colors"
+                        >
+                          "What programs operate at Maharajgunj Station?"
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setInputVal("What engineering safeguards are required for Himalayan run-of-river hydro?");
+                          }}
+                          className="text-left text-[11px] font-mono p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 transition-colors"
+                        >
+                          "What safeguards apply to Himalayan hydro?"
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
@@ -609,35 +551,31 @@ function AIAdvisorInner() {
               <div className="space-y-6">
                 <div>
                   <div className="text-[10px] font-mono text-[#00D4AA] uppercase tracking-widest mb-3">
-                    02 • RECOMMENDED ACTIONS
+                    02 • SUGGESTED INQUIRIES
                   </div>
                   <div className="space-y-2">
-                    {defaultConversations[activeScenario]?.nextSteps.map((step, i) => (
-                      <div
+                    {defaultConversations[activeScenario]?.suggestedPrompts.map((prompt, i) => (
+                      <button
                         key={i}
-                        className="p-2.5 rounded bg-white/5 border border-white/5 text-xs text-white/80 flex items-start gap-2"
+                        type="button"
+                        onClick={() => setInputVal(prompt)}
+                        className="w-full text-left p-2.5 rounded bg-white/5 hover:bg-white/10 border border-white/5 text-xs text-white/80 transition-colors flex items-start gap-2"
                       >
                         <span className="text-[#00D4AA] font-mono font-bold">›</span>
-                        <span>{step}</span>
-                      </div>
+                        <span>{prompt}</span>
+                      </button>
                     ))}
                   </div>
                 </div>
 
                 <div>
                   <div className="text-[10px] font-mono text-white/50 uppercase tracking-widest mb-2">
-                    VERIFIED PROTOCOLS
+                    KNOWLEDGE REPOSITORY
                   </div>
-                  <div className="space-y-2">
-                    {defaultConversations[activeScenario]?.templates.map((tpl, i) => (
-                      <div
-                        key={i}
-                        className="p-2 rounded bg-white/5 hover:bg-white/10 transition-colors text-xs text-white/70 font-mono flex items-center justify-between"
-                      >
-                        <span className="truncate">{tpl}</span>
-                        <span className="text-[#00D4AA] ml-2">↓</span>
-                      </div>
-                    ))}
+                  <div className="p-3 rounded bg-white/5 border border-white/5 text-xs font-mono text-white/70 space-y-1.5">
+                    <div>• 28 Sourced Reports Indexed</div>
+                    <div>• UNFCCC NDC, World Bank CCKP, ICIMOD</div>
+                    <div>• Switch to "Chat Knowledge Base" to select specific documents</div>
                   </div>
                 </div>
               </div>
