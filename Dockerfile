@@ -18,9 +18,12 @@ COPY . .
 # Build arguments for environment variables needed at build time
 ARG WORDPRESS_URL
 ARG WORDPRESS_HOSTNAME
+ARG RAILWAY_ENVIRONMENT
 ENV WORDPRESS_URL=$WORDPRESS_URL
 ENV WORDPRESS_HOSTNAME=$WORDPRESS_HOSTNAME
+ENV RAILWAY_ENVIRONMENT=$RAILWAY_ENVIRONMENT
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV OUTPUT_STANDALONE=true
 
 RUN pnpm build
 
@@ -30,6 +33,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
@@ -40,8 +45,5 @@ COPY --from=builder /app/.next/static ./.next/static
 USER nextjs
 
 EXPOSE 3000
-
-# Railway sets PORT dynamically - default to 3000 if not set
-ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]

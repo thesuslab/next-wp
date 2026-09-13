@@ -98,7 +98,7 @@ export function LabLensProvider({ children }: { children: React.ReactNode }) {
     if (pathname.includes("/community")) {
       return {
         title: "Physical Commons & Network Dynamics",
-        subtitle: "Lab Facility: Patan / Kathmandu Station",
+        subtitle: "Lab Facility: Maharajgunj / Kathmandu Station",
         category: "COMMUNITY ECOSYSTEM",
         confidenceScore: 95,
         metrics: [
@@ -117,7 +117,7 @@ export function LabLensProvider({ children }: { children: React.ReactNode }) {
     // Default / Homepage / Lab / Intelligence
     return {
       title: "Planetary & Environmental Intelligence",
-      subtitle: "Active Coordinates: 27.7172° N, 85.3240° E",
+      subtitle: "Active Coordinates: 27.7408° N, 85.3365° E (Maharajgunj)",
       category: "EARTH TELEMETRY",
       confidenceScore: 96,
       metrics: [

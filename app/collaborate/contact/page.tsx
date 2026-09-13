@@ -12,7 +12,7 @@ export const metadata: Metadata = createPageMetadata({
     "Contact Sustainability Lab",
     "Project Intake",
     "Directorate Consultation",
-    "Patan Station Address",
+    "Maharajgunj Station Address",
   ],
 });
 

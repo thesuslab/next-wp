@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface CaseStudy {
   id: string;
@@ -15,6 +16,7 @@ interface CaseStudy {
   intervention: string;
   outcome: string;
   whatWeLearned: string;
+  image?: string;
 }
 
 const caseStudies: CaseStudy[] = [
@@ -56,6 +58,7 @@ const caseStudies: CaseStudy[] = [
     intervention: "Crafted modular acoustic baffles and demountable research furniture utilizing traditional mortise-and-tenon joints without chemical glues or VOC resins.",
     outcome: "4.8 tons of heritage timber diverted from kiln incineration; commissioned by 3 regional research institutes with an estimated 60-year lifespan.",
     whatWeLearned: "Centenarian heartwood requires specialized diamond-toothed blades to plane due to silica mineralization, but rewards the effort with dimensional stability impossible to find in new timber.",
+    image: "/images/karva-hero.jpg",
   },
   {
     id: "case-04",
@@ -142,9 +145,30 @@ export default function WorkPage() {
                 <span className="text-muted-foreground">{cs.year}</span>
               </div>
 
-              <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-8">
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-6">
                 {cs.title}
               </h2>
+
+              {cs.image && (
+                <div className="mb-8 rounded-xl overflow-hidden border border-border/80 relative aspect-[21/9] bg-black">
+                  <Image
+                    src={cs.image}
+                    alt={cs.title}
+                    fill
+                    sizes="(max-width: 1200px) 100vw, 1200px"
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-between p-4 sm:p-6 font-mono text-xs">
+                    <span className="text-white/90">KĀRVA Material Fabrication Specimen SL / 001</span>
+                    <Link
+                      href="/karva"
+                      className="px-3 py-1.5 rounded bg-[#B8926A] text-black font-bold uppercase tracking-wider hover:bg-[#B8926A]/90 transition-colors"
+                    >
+                      Visit KĀRVA Craft Studio →
+                    </Link>
+                  </div>
+                </div>
+              )}
 
               {/* 6-Part Structured Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-xs font-mono">

@@ -21,16 +21,16 @@ export function OrganizationJsonLd() {
       "Interdisciplinary research laboratory and living platform for environmental intelligence, resilient infrastructure, climate risk adaptation, circular craftsmanship, and enterprise incubation.",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Patan Research Station, Lalitpur",
-      addressLocality: "Patan",
+      streetAddress: "Maharajgunj",
+      addressLocality: "Maharajgunj, Kathmandu",
       addressRegion: "Bagmati Province",
-      postalCode: "44700",
+      postalCode: "44600",
       addressCountry: "NP",
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: "27.6710",
-      longitude: "85.3240",
+      latitude: "27.740824",
+      longitude: "85.336483",
     },
     contactPoint: {
       "@type": "ContactPoint",

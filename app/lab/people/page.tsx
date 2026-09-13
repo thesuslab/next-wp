@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = createPageMetadata({
   title: "People, Fellows & Research Directorate",
   description:
-    "Meet the team of hydrologists, data engineers, infrastructure architects, and circularity fellows at the Sustainability Lab in Patan.",
+    "Meet the team of hydrologists, data engineers, infrastructure architects, and circularity fellows at the Sustainability Lab in Maharajgunj, Kathmandu.",
   path: "/lab/people",
   keywords: [
     "Sustainability Lab Team",
@@ -30,7 +30,7 @@ const team: TeamMember[] = [
     role: "Technology, Systems & AI Lead",
     philosophy: "Technology is only useful when it makes difficult, compound problems legible to the people living with them.",
     domains: ["Domain AI", "Spatial Data Pipelines", "Enterprise Incubation"],
-    station: "Patan Station",
+    station: "Maharajgunj Station",
   },
   {
     name: "Dr. Sunita Shrestha",
@@ -51,14 +51,14 @@ const team: TeamMember[] = [
     role: "KĀRVA Master Craftsman & Materials Researcher",
     philosophy: "Old wood has memory; if you listen to its grain, it tells you what it wants to become next.",
     domains: ["Vernacular Joinery", "Reclaimed Sal Timber", "Circular Prototyping"],
-    station: "KĀRVA Studio Patan",
+    station: "KĀRVA Studio Maharajgunj",
   },
   {
     name: "Pooja Gurung",
     role: "Community & Safeguards Director",
     philosophy: "Free, prior, and informed consent is not a legal checklist—it is an enduring social covenant.",
     domains: ["FPIC Protocols", "Indigenous Stewardship", "Social Impact"],
-    station: "Patan Station",
+    station: "Maharajgunj Station",
   },
   {
     name: "Aarav Adhikari",

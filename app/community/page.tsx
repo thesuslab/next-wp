@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { LocationMap } from "@/components/maps/LocationMap";
 
 interface CommunityEvent {
   id: string;
@@ -97,7 +98,7 @@ export default function CommunityPage() {
             <span className="text-data">WHO CARE ABOUT WHAT HAPPENS NEXT.</span>
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed font-light">
-            Not generic coworking. The Lab is an active laboratory, workshop, and shared workspace in Patan for climate builders, researchers, founders, and curious practitioners.
+            Not generic coworking. The Lab is an active laboratory, workshop, and shared workspace in Maharajgunj, Kathmandu for climate builders, researchers, founders, and curious practitioners.
           </p>
         </div>
 
@@ -238,6 +239,9 @@ export default function CommunityPage() {
           </div>
         </div>
 
+        {/* Maharajgunj Station Map */}
+        <LocationMap className="mt-20" />
+
         {/* RSVP Modal */}
         {rsvpEvent && (
           <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
@@ -258,7 +262,7 @@ export default function CommunityPage() {
                 {rsvpEvent.title}
               </h4>
               <p className="text-muted-foreground text-xs font-sans mb-6">
-                {rsvpEvent.date} • {rsvpEvent.time} at Patan Lab Station.
+                {rsvpEvent.date} • {rsvpEvent.time} at Maharajgunj Lab Station.
               </p>
 
               {rsvpSuccess ? (

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createPageMetadata } from "@/lib/metadata";
 import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { LocationMap } from "@/components/maps/LocationMap";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = createPageMetadata({
@@ -12,7 +13,7 @@ export const metadata: Metadata = createPageMetadata({
     "Our Story Sustainability Lab",
     "Genesis",
     "Himalayan Watershed Resilience",
-    "Patan Station Nepal",
+    "Maharajgunj Station Nepal",
     "Circular Craftsmanship KĀRVA",
   ],
 });
@@ -160,10 +161,10 @@ export default function OurStoryPage() {
 
           <section className="space-y-4 border-t border-border/40 pt-10">
             <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-              4. The Patan Research Station
+              4. The Maharajgunj Research Station
             </h2>
             <p>
-              Today, from our research station in Patan, Kathmandu Valley, we
+              Today, from our research station in Maharajgunj, Kathmandu Valley, we
               bring together hydrologists, data scientists, architects,
               policymakers, and local builders. We test hypotheses in living
               watersheds, engineer bio-shields for critical assets, salvage
@@ -173,6 +174,8 @@ export default function OurStoryPage() {
             <p className="font-mono text-sm text-bamboo italic">
               &quot;The point isn&apos;t to predict the future. It&apos;s to make ourselves ready for it.&quot;
             </p>
+
+            <LocationMap className="my-8" />
           </section>
 
           {/* Call to action */}

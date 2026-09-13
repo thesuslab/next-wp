@@ -39,4 +39,5 @@ next-env.d.ts
 
 .claude
 .factory
+.vscode
 RAILWAY-SETUP.md

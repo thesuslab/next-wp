@@ -84,13 +84,14 @@ export default function AIAdvisorPage() {
 
   const contextData = defaultConversations[activeTopic];
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputVal.trim()) return;
 
+    const userText = inputVal.trim();
     const newMsg: Message = {
       role: "user",
-      content: inputVal,
+      content: userText,
       time: "Just now",
     };
 
@@ -98,17 +99,45 @@ export default function AIAdvisorPage() {
     setInputVal("");
     setIsTyping(true);
 
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [...messages, newMsg].map((m) => ({
+            role: m.role === "user" ? "user" : "assistant",
+            content: m.content,
+          })),
+          context: {
+            topic: activeTopic,
+            station: "Maharajgunj Research Station, Kathmandu",
+            sector: activeTopic === "packaging" ? "Circular Bio-Materials" : "Renewable Energy & Water",
+          },
+        }),
+      });
+
+      const data = await res.json();
       setMessages((prev) => [
         ...prev,
         {
           role: "lab",
-          content: "We've synthesized your inquiry with our regional environmental intelligence layers. To turn this into an operational milestone, consider reviewing the recommended action items and template guidelines in the right-hand panel.",
+          content: data.text || "Synthesis complete.",
           time: "Just now",
         },
       ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "lab",
+          content:
+            "We've synthesized your inquiry with our regional environmental intelligence layers. To turn this into an operational milestone, consider reviewing the recommended action items and template guidelines in the right-hand panel.",
+          time: "Just now",
+        },
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 700);
+    }
   };
 
   const switchTopic = (topic: "packaging" | "eia") => {

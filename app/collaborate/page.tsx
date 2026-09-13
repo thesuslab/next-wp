@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { LocationMap } from "@/components/maps/LocationMap";
 
 type IntentType =
   | "project"
@@ -283,6 +284,9 @@ export default function CollaboratePage() {
             </form>
           )}
         </div>
+
+        {/* Maharajgunj Station Map */}
+        <LocationMap className="mt-16" />
       </div>
     </main>
   );

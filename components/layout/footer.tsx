@@ -60,7 +60,7 @@ export function Footer() {
                 Research. Experiment. Collaborate. Build.
               </p>
               <p className="text-xs text-muted-foreground/40">
-                Kathmandu, Nepal
+                Maharajgunj, Kathmandu, Nepal
               </p>
               <p className="text-xs text-muted-foreground/40">
                 hello@sustainabilitylab.org

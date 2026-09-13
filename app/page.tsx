@@ -17,12 +17,12 @@ const HOME_FAQ_ITEMS = [
   {
     question: "What is the Sustainability Lab?",
     answer:
-      "The Sustainability Lab is an interdisciplinary research laboratory, environmental intelligence platform, and circular design studio based in Patan, Kathmandu Valley, Nepal. It bridges planetary environmental science, climate engineering, high-resolution spatial telemetry, circular craftsmanship (KĀRVA), and entrepreneurial incubation.",
+      "The Sustainability Lab is an interdisciplinary research laboratory, environmental intelligence platform, and circular design studio based in Maharajgunj, Kathmandu Valley, Nepal. It bridges planetary environmental science, climate engineering, high-resolution spatial telemetry, circular craftsmanship (KĀRVA), and entrepreneurial incubation.",
   },
   {
     question: "Where is the Sustainability Lab located?",
     answer:
-      "The Sustainability Lab's primary research station, material workshop, and community coworking hub are located in Patan, Lalitpur, within the Kathmandu Valley of Nepal.",
+      "The Sustainability Lab's primary research station, material workshop, and community coworking hub are located in Maharajgunj, Kathmandu Valley, Nepal (Coordinates: 27.7408° N, 85.3365° E).",
   },
   {
     question: "What is KĀRVA by the Sustainability Lab?",

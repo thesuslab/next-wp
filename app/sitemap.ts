@@ -1,10 +1,12 @@
 import { MetadataRoute } from "next";
 import { getAllPostsForSitemap, getAllPages } from "@/lib/wordpress";
 import { siteConfig } from "@/site.config";
+import { getAllKnowledgeEntries } from "@/lib/knowledge/data";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllPostsForSitemap();
   const pages = await getAllPages();
+  const knowledgeEntries = getAllKnowledgeEntries();
 
   const coreRoutes: MetadataRoute.Sitemap = [
     {
@@ -187,5 +189,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...coreRoutes, ...postUrls, ...pageUrls];
+  const knowledgeUrls: MetadataRoute.Sitemap = knowledgeEntries.map((entry) => ({
+    url: `${siteConfig.site_domain}/intelligence/knowledge/${entry.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  return [...coreRoutes, ...knowledgeUrls, ...postUrls, ...pageUrls];
 }

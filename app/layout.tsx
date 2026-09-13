@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     "Spatial GIS Remote Sensing",
     "Nepal Climate Resilience",
     "Kathmandu Valley",
-    "Patan Research Station",
+    "Maharajgunj Research Station",
     "Himalayan Watershed Hydrology",
     "EIA IEE Safeguards",
   ],

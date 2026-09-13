@@ -4,15 +4,15 @@ import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Coworking & Desk Residencies — Patan Station",
+  title: "Coworking & Desk Residencies — Maharajgunj Station",
   description:
-    "Work from the Sustainability Lab in Patan. Flexible desks, private meeting rooms, rapid prototyping tools, and community membership for climate founders and researchers.",
+    "Work from the Sustainability Lab in Maharajgunj, Kathmandu. Flexible desks, private meeting rooms, rapid prototyping tools, and community membership for climate founders and researchers.",
   path: "/community/coworking",
   keywords: [
-    "Patan Coworking Space",
+    "Maharajgunj Coworking Space",
     "Climate Desk Residency",
     "Sustainability Lab Coworking",
-    "Lalitpur Workstations",
+    "Kathmandu Workstations",
   ],
 });
 

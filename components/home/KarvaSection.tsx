@@ -2,6 +2,7 @@
 
 import { useIntersectionObserver } from "@/lib/hooks/useIntersectionObserver";
 import Link from "next/link";
+import Image from "next/image";
 
 const TRANSFORMATION_STEPS = [
   { label: "DISCARDED", desc: "What was thrown away" },
@@ -10,13 +11,35 @@ const TRANSFORMATION_STEPS = [
   { label: "KĀRVA", desc: "What it became" },
 ];
 
-const MATERIALS = [
-  "wood grain",
-  "reclaimed timber",
-  "old brick",
-  "tools",
-  "engraving",
-  "finished objects",
+const KARVA_GALLERY_TILES = [
+  {
+    title: "Handcrafted Sal Specimen",
+    src: "/images/karva-hero.jpg",
+    alt: "KĀRVA handcrafted product specimen on the studio workbench",
+    className: "col-span-2 aspect-[21/10] sm:aspect-[2/1]",
+    badge: "SPECIMEN SL / 001",
+  },
+  {
+    title: "Artisan Joinery",
+    src: "/images/karva-process.jpg",
+    alt: "Artisan hands shaping natural materials and bio-composite forms in the workshop",
+    className: "aspect-square",
+    badge: "WORKSHOP PROCESS",
+  },
+  {
+    title: "Bio-Fiber Matrix",
+    src: "/images/karva-macro.jpg",
+    alt: "Detail of natural fiber grain, pressed leaf textures, and mineral binder integration",
+    className: "aspect-square",
+    badge: "MACRO TEXTURE",
+  },
+  {
+    title: "Fabrication Lab Bench",
+    src: "/images/lab-workbench.jpg",
+    alt: "KĀRVA Material Fabrication Lab: wood samples, slate prototypes, and measuring tools",
+    className: "col-span-2 aspect-[21/9]",
+    badge: "STUDIO WORKBENCH",
+  },
 ];
 
 export function KarvaSection() {
@@ -108,7 +131,7 @@ export function KarvaSection() {
             </div>
           </div>
 
-          {/* Right — Material grid */}
+          {/* Right — Tactile Photo Grid */}
           <div
             className={`transition-all duration-700 delay-500 ${
               isVisible
@@ -116,20 +139,46 @@ export function KarvaSection() {
                 : "opacity-0 translate-y-8"
             }`}
           >
-            <div className="grid grid-cols-2 gap-2">
-              {MATERIALS.map((material, i) => (
-                <div
-                  key={material}
-                  className={`aspect-square border border-white/5 bg-white/[0.02] flex items-end p-4 transition-all duration-500 hover:bg-white/[0.04] ${
-                    i === 0 ? "col-span-2 aspect-[2/1]" : ""
-                  }`}
+            <div className="grid grid-cols-2 gap-3">
+              {KARVA_GALLERY_TILES.map((tile, i) => (
+                <Link
+                  key={tile.title}
+                  href="/karva"
+                  className={`group relative overflow-hidden rounded-xl border border-white/10 bg-black/40 block ${tile.className}`}
                   style={{ transitionDelay: `${0.6 + i * 0.1}s` }}
                 >
-                  <span className="text-[10px] font-mono text-white/25 tracking-[0.1em] uppercase">
-                    {material}
-                  </span>
-                </div>
+                  <Image
+                    src={tile.src}
+                    alt={tile.alt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10 transition-opacity duration-300 group-hover:opacity-90" />
+                  
+                  <div className="absolute inset-0 p-4 flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                      <span className="text-[9px] font-mono tracking-widest px-2 py-0.5 rounded bg-black/60 text-[#B8926A] border border-[#B8926A]/30 uppercase backdrop-blur-sm">
+                        {tile.badge}
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="font-display font-medium text-sm sm:text-base text-white group-hover:text-[#B8926A] transition-colors">
+                        {tile.title}
+                      </h4>
+                      <p className="text-[10px] font-mono text-white/50 truncate mt-0.5">
+                        {tile.alt}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
               ))}
+            </div>
+            <div className="mt-4 flex items-center justify-between text-xs font-mono text-white/40 px-1">
+              <span>Authentic Himalayan Materials & Studio Fabrication</span>
+              <Link href="/karva" className="text-[#B8926A] hover:text-white transition-colors">
+                View All Archive →
+              </Link>
             </div>
           </div>
         </div>

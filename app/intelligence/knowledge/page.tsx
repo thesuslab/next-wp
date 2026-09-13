@@ -2,96 +2,72 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import {
+  knowledgeEntries,
+  KnowledgeEntry,
+  getKnowledgeTopics,
+} from "@/lib/knowledge/data";
 
-interface KnowledgeArticle {
-  id: string;
-  title: string;
-  category: "Climate" | "Infrastructure" | "Enterprise" | "Environment" | "Policy" | "Tools" | "Case Studies";
-  readTime: string;
-  date: string;
-  summary: string;
-  relatedTool?: string;
-  relatedProject?: string;
-}
+const categories = [
+  "ALL",
+  "Climate",
+  "Policy",
+  "Infrastructure",
+  "Environment",
+  "Enterprise",
+  "Tools",
+] as const;
 
-const articles: KnowledgeArticle[] = [
-  {
-    id: "01",
-    title: "Designing Run-of-River Hydro for 2050 Glacial Hydrology Scenarios",
-    category: "Climate",
-    readTime: "8 min read",
-    date: "Aug 2026",
-    summary: "Himalayan discharge models show a 32% increase in peak monsoon flash events alongside a 14% drop in dry-season baseline flow. How engineering standards must shift.",
-    relatedTool: "Climate Risk Scanner",
-    relatedProject: "Trishuli Basin Hydro Baseline",
-  },
-  {
-    id: "02",
-    title: "Sponge City Retrofits in Dense Historical Newar Settlements",
-    category: "Infrastructure",
-    readTime: "12 min read",
-    date: "Jul 2026",
-    summary: "How ancient hitis, ponds (pukhuris), and permeable brick paving provide a decentralized blueprint for urban flood absorption in Patan.",
-    relatedTool: "Resilience Score Calculator",
-    relatedProject: "Resilient Urban Ward Pilot",
-  },
-  {
-    id: "03",
-    title: "Financing Circular Agri-Waste Enterprises in South Asia",
-    category: "Enterprise",
-    readTime: "10 min read",
-    date: "Aug 2026",
-    summary: "A practical breakdown of debt-equity ratios, concessional climate finance facilities, and working capital buffers for bio-material manufacturers.",
-    relatedTool: "Enterprise Diagnostic Tool",
-    relatedProject: "KĀRVA Material Experiments",
-  },
-  {
-    id: "04",
-    title: "Environmental Impact Assessments Beyond the Compliance Checkbox",
-    category: "Environment",
-    readTime: "7 min read",
-    date: "Jun 2026",
-    summary: "Moving from static paper reports to continuous spatial telemetry and living sensor networks for infrastructure projects.",
-    relatedTool: "Spatial GIS Inspector",
-    relatedProject: "Mid-Hill Bio-Engineering Corridor",
-  },
-  {
-    id: "05",
-    title: "Community Free, Prior & Informed Consent (FPIC) Protocol Framework",
-    category: "Policy",
-    readTime: "15 min read",
-    date: "May 2026",
-    summary: "Translating international multilateral safeguards into indigenous and community stewardship agreements in high-mountain watersheds.",
-    relatedTool: "Safeguard Auditor",
-    relatedProject: "Eastern Hill Agro-Forestry",
-  },
-  {
-    id: "06",
-    title: "The KĀRVA Circular Timber Salvage Standard & Testing Protocol",
-    category: "Case Studies",
-    readTime: "9 min read",
-    date: "Jul 2026",
-    summary: "Grading compressive strength and non-toxic surface treatment methods for 80-year-old salvaged Shorea robusta (Sal) architectural timber.",
-    relatedTool: "Material Circularity Audit",
-    relatedProject: "KĀRVA Collection 01",
-  },
-];
-
-const categories = ["ALL", "Climate", "Infrastructure", "Enterprise", "Environment", "Policy", "Tools", "Case Studies"] as const;
+const kinds = ["ALL", "knowledge", "research", "documentation"] as const;
 
 export default function KnowledgePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [selectedTopic, setSelectedTopic] = useState<string>("ALL");
+  const [selectedKind, setSelectedKind] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const allTopics = useMemo(() => getKnowledgeTopics(), []);
+
   const filteredArticles = useMemo(() => {
-    return articles.filter((art) => {
-      const matchesCat = selectedCategory === "ALL" || art.category === selectedCategory;
-      const matchesSearch =
-        art.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        art.summary.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCat && matchesSearch;
+    const query = searchQuery.trim().toLowerCase();
+    return knowledgeEntries.filter((art) => {
+      const matchesCat =
+        selectedCategory === "ALL" || art.category === selectedCategory;
+      const matchesTopic =
+        selectedTopic === "ALL" || art.topic === selectedTopic;
+      const matchesKind =
+        selectedKind === "ALL" || art.kind === selectedKind;
+
+      if (!matchesCat || !matchesTopic || !matchesKind) return false;
+
+      if (!query) return true;
+
+      const inTitle = art.title.toLowerCase().includes(query);
+      const inSummary = art.summary.toLowerCase().includes(query);
+      const inBody = art.body.toLowerCase().includes(query);
+      const inTopic = art.topic.toLowerCase().includes(query);
+      const inSource = art.source.name.toLowerCase().includes(query);
+      const inLocality = art.locality?.toLowerCase().includes(query) || false;
+      const inTags = art.tags.some((t) => t.toLowerCase().includes(query));
+
+      return (
+        inTitle ||
+        inSummary ||
+        inBody ||
+        inTopic ||
+        inSource ||
+        inLocality ||
+        inTags
+      );
     });
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory, selectedTopic, selectedKind, searchQuery]);
+
+  const resetFilters = () => {
+    setSelectedCategory("ALL");
+    setSelectedTopic("ALL");
+    setSelectedKind("ALL");
+    setSearchQuery("");
+  };
 
   return (
     <main className="min-h-screen bg-background text-foreground pt-12 pb-24">
@@ -107,30 +83,34 @@ export default function KnowledgePage() {
 
         {/* Hero */}
         <div className="max-w-3xl mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-data/10 border border-data/30 text-data text-xs font-mono mb-4">
+            <span className="w-2 h-2 rounded-full bg-data animate-pulse" />
+            28 VERIFIED EVIDENCE ENTRIES • SOURCE-LINKED
+          </div>
           <h1 className="font-display text-4xl sm:text-6xl font-bold tracking-tight uppercase leading-[0.95] mb-6">
             KNOWLEDGE FOR <br />
             <span className="text-data">PRACTITIONERS.</span>
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed font-light">
-            Field manuals, policy blueprints, spatial models, and technical research from our lab experiments and real-world infrastructure deployments.
+            Field manuals, policy blueprints, climate risk portals, and technical syntheses grounded in official multilateral assessments, national commitments, and local ecosystems.
           </p>
         </div>
 
         {/* Search & Filter Bar */}
-        <div className="space-y-6 mb-12">
+        <div className="space-y-6 mb-12 bg-card/60 border border-border/80 rounded-2xl p-6 backdrop-blur-sm shadow-sm">
           {/* Search Input */}
-          <div className="relative max-w-2xl">
+          <div className="relative max-w-3xl">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search the Lab knowledge base by topic, keyword, or project..."
-              className="w-full px-4 py-3 rounded-xl bg-card border border-border text-sm placeholder:text-muted-foreground focus:border-data focus:outline-none font-mono"
+              placeholder="Search by keyword, source (World Bank, NDC, ICIMOD, WHO), topic, locality..."
+              className="w-full px-4 py-3.5 rounded-xl bg-background border border-border text-sm placeholder:text-muted-foreground focus:border-data focus:ring-1 focus:ring-data focus:outline-none font-mono"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-3 text-xs font-mono text-muted-foreground hover:text-foreground"
+                className="absolute right-3 top-3.5 text-xs font-mono text-muted-foreground hover:text-foreground px-2 py-0.5 rounded bg-muted"
               >
                 Clear
               </button>
@@ -138,73 +118,216 @@ export default function KnowledgePage() {
           </div>
 
           {/* Category Filter Pills */}
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all ${
-                  selectedCategory === cat
-                    ? "bg-data text-black font-semibold shadow-[0_0_12px_rgba(0,212,170,0.3)]"
-                    : "bg-card border border-border/70 text-muted-foreground hover:text-foreground hover:border-foreground/30"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                Domain Category
+              </span>
+              {(selectedCategory !== "ALL" ||
+                selectedTopic !== "ALL" ||
+                selectedKind !== "ALL" ||
+                searchQuery) && (
+                <button
+                  onClick={resetFilters}
+                  className="text-xs font-mono text-data hover:underline"
+                >
+                  Reset all filters
+                </button>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all ${
+                    selectedCategory === cat
+                      ? "bg-data text-black font-semibold shadow-[0_0_12px_rgba(0,212,170,0.3)]"
+                      : "bg-background border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* Secondary Filters: Topic & Kind */}
+          <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-border/40 text-xs font-mono">
+            {/* Kind Filter */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-muted-foreground mr-1">Kind:</span>
+              {kinds.map((kind) => (
+                <button
+                  key={kind}
+                  onClick={() => setSelectedKind(kind)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] capitalize transition-colors ${
+                    selectedKind === kind
+                      ? "bg-foreground text-background font-semibold"
+                      : "bg-muted/60 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {kind}
+                </button>
+              ))}
+            </div>
+
+            {/* Specific Topic Select */}
+            <div className="flex items-center gap-2 ml-auto">
+              <span className="text-muted-foreground">Topic:</span>
+              <select
+                value={selectedTopic}
+                onChange={(e) => setSelectedTopic(e.target.value)}
+                className="bg-background border border-border text-foreground rounded-lg px-2.5 py-1 text-xs font-mono focus:outline-none focus:border-data"
+              >
+                <option value="ALL">All Topics ({allTopics.length})</option>
+                {allTopics.map((topic) => (
+                  <option key={topic} value={topic}>
+                    {topic}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Results Metadata Bar */}
+        <div className="flex items-center justify-between text-xs font-mono text-muted-foreground mb-6">
+          <div>
+            Showing <span className="text-foreground font-semibold">{filteredArticles.length}</span> of{" "}
+            <span>{knowledgeEntries.length}</span> articles
+          </div>
+          {filteredArticles.length > 0 && (
+            <div className="hidden sm:block text-[11px]">
+              Click any report to read full text & inspect provenance
+            </div>
+          )}
         </div>
 
         {/* Articles Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredArticles.map((art) => (
-            <div
+            <article
               key={art.id}
-              className="p-6 rounded-xl bg-card border border-border/60 hover:border-data/50 transition-all flex flex-col justify-between group"
+              className="p-6 rounded-2xl bg-card border border-border/70 hover:border-data/60 transition-all flex flex-col justify-between group shadow-sm hover:shadow-md"
             >
               <div>
+                {/* Meta Top: Kind, Category, Read Time */}
                 <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground mb-3">
-                  <span className="px-2 py-0.5 rounded bg-muted text-foreground">
-                    {art.category}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded bg-muted text-foreground uppercase tracking-wider font-semibold text-[10px]">
+                      {art.category}
+                    </span>
+                    <span className="px-2 py-0.5 rounded bg-data/10 text-data text-[10px] uppercase font-mono">
+                      {art.kind}
+                    </span>
+                  </div>
                   <span>{art.readTime}</span>
                 </div>
 
+                {/* Title */}
                 <h2 className="font-display font-bold text-lg leading-snug group-hover:text-data transition-colors mb-3">
-                  {art.title}
+                  <Link href={`/intelligence/knowledge/${art.slug}`}>
+                    {art.title}
+                  </Link>
                 </h2>
 
-                <p className="text-xs text-muted-foreground leading-relaxed mb-6">
+                {/* Summary */}
+                <p className="text-xs text-muted-foreground leading-relaxed mb-4">
                   {art.summary}
                 </p>
-              </div>
 
-              <div className="pt-4 border-t border-border/40 space-y-3">
-                {art.relatedTool && (
-                  <div className="text-[10px] font-mono text-muted-foreground">
-                    Related Tool: <span className="text-foreground">{art.relatedTool}</span>
+                {/* Structured Data Metric Callout (if present) */}
+                {art.data && (
+                  <div className="mb-4 p-2.5 rounded-lg bg-muted/40 border border-border/50 text-[11px] font-mono text-muted-foreground">
+                    <div className="text-foreground font-medium text-[10px] uppercase tracking-wider mb-1 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-data" />
+                      Climate Telemetry Data:
+                    </div>
+                    {art.data.annualTemperatureC && (
+                      <div>• Baseline: {art.data.annualTemperatureC}°C / {art.data.annualPrecipitationMm}mm ({art.data.period})</div>
+                    )}
+                    {art.data.temperatureChangeCPerDecade && (
+                      <div>• Trend: +{art.data.temperatureChangeCPerDecade}°C/decade ({art.data.dataset} since {art.data.startYear})</div>
+                    )}
+                    {art.data.temperatureMedianC && (
+                      <div>• {art.data.scenario}: +{art.data.temperatureMedianC}°C median [{art.data.temperatureP10C}–{art.data.temperatureP90C}°C range]</div>
+                    )}
                   </div>
                 )}
 
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-xs font-mono font-medium text-foreground hover:text-data cursor-pointer">
-                    Read Report →
-                  </span>
-                  <Link
-                    href="/intelligence/ai"
-                    className="text-[11px] font-mono text-data hover:underline"
-                  >
-                    Ask AI ↗
-                  </Link>
+                {/* Source & Provenance Badge */}
+                <div className="mb-4 text-[11px] font-mono">
+                  <div className="text-muted-foreground truncate" title={art.source.name}>
+                    <span className="text-foreground/70">Source:</span>{" "}
+                    <span className="text-foreground font-medium">{art.source.name.split("—")[0].trim()}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1">
+                    <span className="capitalize">{art.source.level} Evidence</span>
+                    <span>•</span>
+                    <span>{art.source.date}</span>
+                    {art.locality && (
+                      <>
+                        <span>•</span>
+                        <span className="text-data">{art.locality}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-1 mb-6">
+                  {art.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-0.5 rounded text-[10px] font-mono bg-muted/50 text-muted-foreground"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
                 </div>
               </div>
-            </div>
+
+              {/* Card Footer Actions */}
+              <div className="pt-4 border-t border-border/50 flex items-center justify-between">
+                <Link
+                  href={`/intelligence/knowledge/${art.slug}`}
+                  className="text-xs font-mono font-medium text-foreground hover:text-data transition-colors flex items-center gap-1 group/btn"
+                >
+                  Read Report
+                  <span className="transition-transform group-hover/btn:translate-x-1">→</span>
+                </Link>
+
+                <Link
+                  href={`/intelligence/ai?topic=${encodeURIComponent(
+                    art.topic
+                  )}&article=${encodeURIComponent(art.slug)}`}
+                  className="text-[11px] font-mono text-data hover:underline flex items-center gap-1"
+                >
+                  Ask AI ↗
+                </Link>
+              </div>
+            </article>
           ))}
         </div>
 
+        {/* Empty State */}
         {filteredArticles.length === 0 && (
-          <div className="text-center py-16 text-muted-foreground font-mono text-xs">
-            No knowledge articles found matching &quot;{searchQuery}&quot; in {selectedCategory}.
+          <div className="text-center py-20 rounded-2xl bg-card border border-border/60 p-8">
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-4 text-muted-foreground font-mono">
+              ∅
+            </div>
+            <h3 className="font-display font-semibold text-lg mb-2">No matching knowledge articles</h3>
+            <p className="text-sm text-muted-foreground max-w-md mx-auto mb-6">
+              No entries match your search query &quot;{searchQuery}&quot; under the selected filters.
+            </p>
+            <button
+              onClick={resetFilters}
+              className="px-4 py-2 rounded-xl bg-data text-black text-xs font-mono font-semibold hover:bg-data/90 transition-all"
+            >
+              Reset Search & Filters
+            </button>
           </div>
         )}
       </div>
