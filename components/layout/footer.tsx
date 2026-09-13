@@ -21,7 +21,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm font-mono text-xs">
-              Intelligence for a resilient future.
+              Intelligence for a living planet.
             </p>
             <Link
               href="/our-story"

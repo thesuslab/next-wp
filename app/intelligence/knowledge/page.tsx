@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   knowledgeEntries,
@@ -21,16 +21,30 @@ const categories = [
 const kinds = ["ALL", "knowledge", "research", "documentation"] as const;
 
 export default function KnowledgePage() {
+  const [articles, setArticles] = useState<KnowledgeEntry[]>(knowledgeEntries);
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedTopic, setSelectedTopic] = useState<string>("ALL");
   const [selectedKind, setSelectedKind] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const allTopics = useMemo(() => getKnowledgeTopics(), []);
+  useEffect(() => {
+    fetch("/api/editorial/articles")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.articles)) {
+          setArticles(data.articles);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const allTopics = useMemo(() => {
+    return Array.from(new Set(articles.map((e) => e.topic))).sort();
+  }, [articles]);
 
   const filteredArticles = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    return knowledgeEntries.filter((art) => {
+    return articles.filter((art) => {
       const matchesCat =
         selectedCategory === "ALL" || art.category === selectedCategory;
       const matchesTopic =
@@ -60,7 +74,7 @@ export default function KnowledgePage() {
         inTags
       );
     });
-  }, [selectedCategory, selectedTopic, selectedKind, searchQuery]);
+  }, [articles, selectedCategory, selectedTopic, selectedKind, searchQuery]);
 
   const resetFilters = () => {
     setSelectedCategory("ALL");
@@ -85,7 +99,12 @@ export default function KnowledgePage() {
         <div className="max-w-3xl mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-data/10 border border-data/30 text-data text-xs font-mono mb-4">
             <span className="w-2 h-2 rounded-full bg-data animate-pulse" />
-            28 VERIFIED EVIDENCE ENTRIES • SOURCE-LINKED
+            {articles.length} VERIFIED EVIDENCE ENTRIES • SOURCE-LINKED
+            {articles.length > knowledgeEntries.length && (
+              <span className="text-[10px] bg-data/20 text-data px-1.5 py-0.5 rounded font-semibold">
+                +{articles.length - knowledgeEntries.length} INGESTED (6:00 AM FEED)
+              </span>
+            )}
           </div>
           <h1 className="font-display text-4xl sm:text-6xl font-bold tracking-tight uppercase leading-[0.95] mb-6">
             KNOWLEDGE FOR <br />
@@ -196,7 +215,7 @@ export default function KnowledgePage() {
         <div className="flex items-center justify-between text-xs font-mono text-muted-foreground mb-6">
           <div>
             Showing <span className="text-foreground font-semibold">{filteredArticles.length}</span> of{" "}
-            <span>{knowledgeEntries.length}</span> articles
+            <span>{articles.length}</span> articles
           </div>
           {filteredArticles.length > 0 && (
             <div className="hidden sm:block text-[11px]">
@@ -213,6 +232,16 @@ export default function KnowledgePage() {
               className="p-6 rounded-2xl bg-card border border-border/70 hover:border-data/60 transition-all flex flex-col justify-between group shadow-sm hover:shadow-md"
             >
               <div>
+                {/* Editorial Daily Badge if dynamically ingested */}
+                {art.id.startsWith("ed-") && (
+                  <div className="mb-2.5">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-data/15 border border-data/30 text-data text-[10px] font-mono font-semibold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-data animate-pulse" />
+                      EDITORIAL 6:00 AM FEED • VERIFIED
+                    </span>
+                  </div>
+                )}
+
                 {/* Meta Top: Kind, Category, Read Time */}
                 <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground mb-3">
                   <div className="flex items-center gap-1.5">

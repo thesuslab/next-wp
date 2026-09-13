@@ -28,7 +28,7 @@ const fontDisplay = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    default: "Sustainability Lab — Intelligence for a resilient future",
+    default: "Sustainability Lab — Intelligence for a living planet",
     template: "%s | Sustainability Lab",
   },
   description:
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Sustainability Lab — Intelligence for a resilient future",
+    title: "Sustainability Lab — Intelligence for a living planet",
     description:
       "Research. Experiment. Collaborate. Build. Environmental intelligence, climate engineering, circular craftsmanship, and resilient enterprise.",
     url: siteConfig.site_domain,
@@ -88,13 +88,13 @@ export const metadata: Metadata = {
         url: "/logo.png",
         width: 1198,
         height: 542,
-        alt: "The Sustainability Lab — Intelligence for a resilient future",
+        alt: "The Sustainability Lab — Intelligence for a living planet",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sustainability Lab — Intelligence for a resilient future",
+    title: "Sustainability Lab — Intelligence for a living planet",
     description:
       "Environmental intelligence, technology, enterprise and people working together to build systems that can last.",
     images: ["/logo.png"],

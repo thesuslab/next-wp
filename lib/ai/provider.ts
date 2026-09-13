@@ -156,7 +156,7 @@ export function getActiveAIConfig(): AIProviderConfig {
 }
 
 import {
-  knowledgeEntries,
+  getAllKnowledgeEntries,
   getKnowledgeEntryBySlug,
   type KnowledgeEntry,
 } from "../knowledge/data";
@@ -178,21 +178,19 @@ export function findRelevantKnowledgeContext(
 - Topic: ${article.topic} | Category: ${article.category} | Kind: ${article.kind}
 - Primary Source: ${article.source.name} (${article.source.date})
 - Source URL: ${article.source.url}
-- Evidence Level: ${article.source.level.toUpperCase()}
-- Geographic Focus: ${article.region}${article.locality ? ` (${article.locality})` : ""}, ${article.country}
-- Executive Summary: ${article.summary}
-- Full Report Body:
-"""
-${article.body}
-"""${dataStr}`;
+- Summary: ${article.summary}
+- Full Body Extract:
+${article.body}${dataStr}
+`;
     }
   }
 
   const q = (query || "").toLowerCase();
   if (!q.trim()) return "";
 
-  // Search knowledge base
-  const matches = knowledgeEntries.filter((art) => {
+  // Search entire knowledge base including freshly ingested editorial entries
+  const allEntries = getAllKnowledgeEntries();
+  const matches = allEntries.filter((art) => {
     return (
       art.title.toLowerCase().includes(q) ||
       art.slug.toLowerCase().includes(q) ||

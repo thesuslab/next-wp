@@ -71,7 +71,7 @@ export function WebSiteJsonLd() {
     "@id": `${siteConfig.site_domain}/#website`,
     url: siteConfig.site_domain,
     name: "Sustainability Lab",
-    description: "Intelligence for a resilient future.",
+    description: "Intelligence for a living planet.",
     publisher: {
       "@id": `${siteConfig.site_domain}/#organization`,
     },

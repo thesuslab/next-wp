@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Sustainability Lab — Intelligence for a resilient future",
+    name: "Sustainability Lab — Intelligence for a living planet",
     short_name: "Sustainability Lab",
     description:
       "Research. Experiment. Collaborate. Build. Environmental intelligence, climate engineering, circular craftsmanship, and resilient enterprise.",

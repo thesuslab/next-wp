@@ -175,7 +175,7 @@ export function HeroSection() {
           <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95] mb-6">
             INTELLIGENCE FOR
             <br />
-            <span className="text-muted-foreground/60">A RESILIENT FUTURE.</span>
+            <span className="text-muted-foreground/60">A living planet.</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed">

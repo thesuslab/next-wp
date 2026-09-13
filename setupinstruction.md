@@ -335,8 +335,34 @@ The site automatically ships with search and answer engine optimization:
 
 ---
 
-## 8. Support & Directorate Contact
+---
+
+## 8. Automated Daily 6:00 AM Editorial Ingestion & Synthesis Pipeline
+
+The platform includes an automated pipeline that scrapes reputable and verified institutional publishers, synthesizes evidence-based reports with quantitative telemetry and canonical citations, and publishes them into the Knowledge Base and Editorial Dispatches:
+
+- **Verified Whitelist**:
+  - **ICIMOD** (`https://www.icimod.org/feed/`) — Himalayan cryosphere and mountain hydrology
+  - **UNFCCC** (`https://unfccc.int/rss.xml`) — Global climate policy, NDCs, carbon mechanisms
+  - **UNEP** (`https://www.unep.org/rss.xml`) — Circular economy, planetary boundaries, ecosystems
+  - **Mongabay South Asia / Himalaya** (`https://news.mongabay.com/feed/`) — Field environmental journalism
+- **Categorization Taxonomy**: Automatically categorizes into `Climate`, `Policy`, `Infrastructure`, `Environment`, `Enterprise`, or `Case Studies`.
+- **Evidence-Based Rewriter**: Extracts numerical indicators (°C anomalies, precipitation mm, ha, USD finance) and constructs structured sections (Empirical Findings, Ecosystem Impact, Policy & Practical Implications) with zero vendor branding and no raw `<br>` tags.
+- **Trigger Endpoint**: `GET /api/cron/editorial` or `POST /api/cron/editorial`
+  - Protected by `CRON_SECRET` header or `?secret=...`
+  - Supports query parameters `?force=true`, `?limit=3`, `?source=icimod`
+- **Cron Configuration**:
+  - **Railway Cron**: Add a Cron Job with schedule `0 6 * * *` (Daily at 6:00 AM) targeting `curl -s -X POST "https://your-domain.railway.app/api/cron/editorial?secret=$CRON_SECRET"`
+  - **Crontab**:
+    ```bash
+    0 6 * * * curl -s -X POST "https://sustainabilitylab.xyz/api/cron/editorial?secret=YOUR_CRON_SECRET" > /dev/null 2>&1
+    ```
+
+---
+
+## 9. Support & Directorate Contact
 
 - **Headquarters**: Maharajgunj Research Station, Kathmandu Valley, Nepal
 - **Email**: hello@sustainabilitylab.xyz
 - **Website**: [https://sustainabilitylab.xyz](https://sustainabilitylab.xyz)
+

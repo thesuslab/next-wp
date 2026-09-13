@@ -591,9 +591,24 @@ The most humane intervention is often the one that reduces exposure while expand
 ];
 
 /**
- * Query helper to retrieve all entries.
+ * Query helper to retrieve all entries, dynamically merging baseline knowledge seed
+ * with newly ingested and verified editorial articles on the server.
  */
 export function getAllKnowledgeEntries(): KnowledgeEntry[] {
+  if (typeof window === "undefined") {
+    try {
+      // Dynamically load server-side stored editorial articles
+      const { getStoredEditorialArticles } = require("@/lib/editorial/store");
+      const stored = getStoredEditorialArticles();
+      if (Array.isArray(stored) && stored.length > 0) {
+        const seen = new Set(knowledgeEntries.map((e) => e.slug));
+        const unique = stored.filter((e: KnowledgeEntry) => !seen.has(e.slug));
+        return [...unique, ...knowledgeEntries];
+      }
+    } catch {
+      // Fallback cleanly to static baseline
+    }
+  }
   return knowledgeEntries;
 }
 
@@ -601,17 +616,18 @@ export function getAllKnowledgeEntries(): KnowledgeEntry[] {
  * Query helper to find an entry by its unique slug.
  */
 export function getKnowledgeEntryBySlug(slug: string): KnowledgeEntry | undefined {
-  return knowledgeEntries.find((entry) => entry.slug === slug);
+  return getAllKnowledgeEntries().find((entry) => entry.slug === slug);
 }
 
 /**
  * Query helper to retrieve related entries by matching topic or tags.
  */
 export function getRelatedKnowledgeEntries(slug: string, limit = 3): KnowledgeEntry[] {
+  const all = getAllKnowledgeEntries();
   const current = getKnowledgeEntryBySlug(slug);
-  if (!current) return knowledgeEntries.slice(0, limit);
+  if (!current) return all.slice(0, limit);
 
-  return knowledgeEntries
+  return all
     .filter((entry) => entry.slug !== slug)
     .map((entry) => {
       let score = 0;
@@ -627,8 +643,9 @@ export function getRelatedKnowledgeEntries(slug: string, limit = 3): KnowledgeEn
 }
 
 /**
- * List distinct topics.
+ * List distinct topics across all active entries.
  */
 export function getKnowledgeTopics(): string[] {
-  return Array.from(new Set(knowledgeEntries.map((e) => e.topic))).sort();
+  return Array.from(new Set(getAllKnowledgeEntries().map((e) => e.topic))).sort();
 }
+

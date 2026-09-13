@@ -3,7 +3,7 @@ Sustainability Lab — Complete UX Architecture
 Positioning
 
 Sustainability Lab
-Intelligence for a resilient future.
+Intelligence for a living planet.
 
 Supporting idea:
 
@@ -96,7 +96,7 @@ Full viewport.
 Copy
 
 INTELLIGENCE FOR
-A RESILIENT FUTURE.
+A living planet.
 
 Environmental intelligence, technology, enterprise and people working together to build systems that can last.
 
@@ -1359,7 +1359,7 @@ Keep it unusually simple.
 
 SUSTAINABILITY LAB
 
-Intelligence for a resilient future.
+Intelligence for a living planet.
 
 ────────────────────────────
 
