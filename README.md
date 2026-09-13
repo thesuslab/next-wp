@@ -1,37 +1,32 @@
-# Next WP
+# The Sustainability Lab
 
-A modern headless WordPress starter built with Next.js 16, React 19, and TypeScript.
+An interdisciplinary environmental intelligence platform, high-resolution climate engineering workbench, and circular design studio headquartered at the **Maharajgunj Research Station**, Kathmandu Valley, Nepal (`27.7408° N, 85.3365° E`).
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/next-wp?referralCode=AJtQpy&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2F9d8dev%2Fnext-wp&env=WORDPRESS_URL,WORDPRESS_HOSTNAME,WORDPRESS_WEBHOOK_SECRET&envDescription=Add%20WordPress%20URL%20with%20Rest%20API%20enabled%20(ie.%20https%3A%2F%2Fwp.example.com)%2C%20the%20hostname%20for%20Image%20rendering%20in%20Next%20JS%20(ie.%20wp.example.com)%2C%20and%20a%20secret%20key%20for%20secure%20revalidation&project-name=next-wp&repository-name=next-wp&demo-title=Next%20JS%20and%20WordPress%20Starter&demo-url=https%3A%2F%2Fwp.9d8.dev)
+> **Live Platform**: [sustainabilitylab.xyz](https://sustainabilitylab.xyz) | **Knowledge Commons**: 28 Sourced Research Reports & Climate Baselines | **Three Doors**: Intelligence, Resilience, Enterprise (KĀRVA)
 
-![Next WP Screenshot](https://github.com/user-attachments/assets/8b268c36-eb0d-459f-b9f1-b5f129bd29bc)
+---
 
-> **[Live Demo](https://wp.9d8.dev)** | **[Video Tutorial](https://www.youtube.com/watch?v=JZc1-BcOvYw)** | **[Headless Theme (761)](https://github.com/9d8dev/761)**
->
-> Need a WooCommerce version? Try [next-woo](https://github.com/9d8dev/next-woo)
+## The Three Institutional Doors
 
-## Table of Contents
+1. **Door 1: Intelligence & Open Knowledge Hub** (`/intelligence`, `/intelligence/knowledge`)
+   - 28 source-grounded research reports and field guides based on UNFCCC Second NDC, World Bank CCKP, ICIMOD, WHO, and ADB.
+   - Interactive GIS watershed hydrology, decadal warming metrics, and IPCC 2030/2050 Climate Risk Scanner.
+2. **Door 2: Resilience & Engineering** (`/resilience`)
+   - Himalayan watershed hydrology, Run-of-River hydropower lean-flow compliance, GLOF hazard mitigation, and bio-engineered slope stabilization.
+3. **Door 3: Enterprise & KĀRVA Studio** (`/enterprise`, `/karva`)
+   - Circular craftsmanship studio recovering 80-100 year-old salvaged Shorea robusta (Sal) architectural timber, demolition bricks, and agricultural waste into architectural artifacts.
+   - Enterprise diagnostic engine generating instant 30-day resilience roadmaps for regenerative SMEs.
 
-- [Quick Start](#quick-start)
-- [Prerequisites](#prerequisites)
-- [Environment Variables](#environment-variables)
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Deployment](#deployment)
-  - [Railway (Recommended)](#railway-recommended)
-  - [Vercel](#vercel)
-  - [Local Development](#local-development)
-- [WordPress API Functions](#wordpress-api-functions)
-- [Cache Revalidation](#cache-revalidation)
-- [Customization](#customization)
-- [Troubleshooting](#troubleshooting)
-- [Testing](#testing)
-- [Scripts](#scripts)
-- [Contributing](#contributing)
-- [License](#license)
-- [Credits](#credits)
+---
+
+## Features & AI Capabilities
+
+- **Autonomous AI Advisor (`/intelligence/ai`)**: Chat directly with any of the 28 Knowledge Base research reports or explore project scenarios (bio-packaging feasibility, Himalayan hydro EIA safeguards, or Sustainability Lab charter).
+- **Lab Lens Intelligence HUD (`◉ LAB LENS`)**: Real-time telemetry inspector across all pages with multi-provider LLM synthesis (Groq, OpenRouter, OpenAI, Gemini, NVIDIA NIM, or local Ollama).
+- **Evidence-First Knowledge Commons (`/intelligence/knowledge`)**: Dynamic SSG catalog with primary citations, quantitative baselines, and decadal trend indicators.
+- **Headless WordPress & Railway Ready**: Fully standalone with built-in mock fallback, instant healthcheck (`/api/health`), and one-click Railway orchestration.
 
 ## Quick Start
 
