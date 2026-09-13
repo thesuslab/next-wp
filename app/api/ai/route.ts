@@ -16,7 +16,12 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { messages, context, prompt } = body;
+    const { messages, context, prompt, articleSlug } = body;
+
+    const mergedContext = {
+      ...(context || {}),
+      ...(articleSlug ? { articleSlug } : {}),
+    };
 
     let chatMessages: ChatMessage[] = [];
 
@@ -36,7 +41,7 @@ export async function POST(req: Request) {
       ];
     }
 
-    const response = await queryAIProvider(chatMessages, context);
+    const response = await queryAIProvider(chatMessages, mergedContext);
 
     return NextResponse.json(response);
   } catch (err: any) {

@@ -63,7 +63,7 @@ export function Footer() {
                 Maharajgunj, Kathmandu, Nepal
               </p>
               <p className="text-xs text-muted-foreground/40">
-                hello@sustainabilitylab.org
+                hello@sustainabilitylab.xyz
               </p>
             </div>
             <p className="font-display text-sm text-bamboo font-medium italic">

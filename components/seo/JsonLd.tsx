@@ -34,7 +34,7 @@ export function OrganizationJsonLd() {
     },
     contactPoint: {
       "@type": "ContactPoint",
-      email: "hello@sustainabilitylab.org",
+      email: "hello@sustainabilitylab.xyz",
       contactType: "directorate",
       availableLanguage: ["English", "Nepali"],
     },

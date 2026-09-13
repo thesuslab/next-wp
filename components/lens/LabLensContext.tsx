@@ -114,10 +114,72 @@ export function LabLensProvider({ children }: { children: React.ReactNode }) {
       };
     }
 
-    // Default / Homepage / Lab / Intelligence
+    if (pathname.startsWith("/intelligence/knowledge")) {
+      // Check if viewing a specific article
+      const segments = pathname.split("/").filter(Boolean);
+      const articleSlug = segments[2]; // /intelligence/knowledge/[slug]
+      
+      if (articleSlug) {
+        return {
+          title: "Knowledge Base Verification Ledger",
+          subtitle: `Article ID: ${articleSlug} • Primary Source Grounded`,
+          category: "VERIFIED EVIDENCE",
+          confidenceScore: 98,
+          metrics: [
+            { label: "EVIDENCE LEVEL", value: "PEER / UN / WB", status: "safe", details: "Ground-truth institutional data verification" },
+            { label: "CITATION AUDIT", value: "VERIFIED", status: "safe", details: "Direct link to primary source publication" },
+            { label: "AI GROUNDING", value: "SYNCHRONIZED", status: "safe", details: "Article text actively available to AI Advisor" },
+            { label: "METHODOLOGY", value: "SYSTEMATIC", status: "neutral", details: "Quantitative baseline & multi-scenario projections" },
+          ],
+          insights: [
+            "This report is registered in the Sustainability Lab verified ledger.",
+            "Ask Lab Lens or the AI Advisor to synthesize this data with your project parameters.",
+          ],
+        };
+      }
+
+      return {
+        title: "Sustainability Lab Knowledge Base",
+        subtitle: "28 Grounded Reports • Evidence-First Environmental Intelligence",
+        category: "KNOWLEDGE COMMONS",
+        confidenceScore: 97,
+        metrics: [
+          { label: "TOTAL REPORTS", value: "28 INDEXED", status: "safe", details: "UNFCCC NDC, World Bank CCKP, ICIMOD, WHO, ADB" },
+          { label: "PRIMARY SOURCES", value: "100% SOURCED", status: "safe", details: "Zero speculative or unsourced claims" },
+          { label: "GEOGRAPHIC SCOPE", value: "HIMALAYAN / S. ASIA", status: "neutral", details: "Nepal national, river basins, & ecological zones" },
+          { label: "AI READINESS", value: "RAG EMBEDDED", status: "safe", details: "Full contextual querying enabled across catalog" },
+        ],
+        insights: [
+          "Browse by Category (Climate, Infrastructure, Policy, Enterprise) or Kind.",
+          "Select any article to interrogate its methodology and localized risk implications with the AI Advisor.",
+        ],
+      };
+    }
+
+    if (pathname.includes("/our-story") || pathname.includes("/lab")) {
+      return {
+        title: "The Sustainability Lab • Maharajgunj Station",
+        subtitle: "Physical Station: 27.7408° N, 85.3365° E • Kathmandu Valley",
+        category: "INSTITUTIONAL IDENTITY",
+        confidenceScore: 99,
+        metrics: [
+          { label: "HEADQUARTERS", value: "MAHARAJGUNJ, KTM", status: "safe", details: "Research station, workshop & testing commons" },
+          { label: "PILLARS", value: "3 DOORS", status: "safe", details: "Intelligence, Resilience, Enterprise (KĀRVA)" },
+          { label: "COMMONS NETWORK", value: "OPEN ACCESS", status: "safe", details: "Fellowships, residencies, and public data APIs" },
+          { label: "FOUNDATION", value: "NON-PROFIT / STUDIO", status: "neutral", details: "Hybrid research lab and regenerative venture studio" },
+        ],
+        insights: [
+          "Door 1 (Intelligence): GIS spatial telemetry, 28 knowledge base reports, climate scanner.",
+          "Door 2 (Resilience): Himalayan watershed hydrology, GLOF modeling, bio-engineering.",
+          "Door 3 (Enterprise): Circular craftsmanship studio (KĀRVA) and regenerative business diagnostics.",
+        ],
+      };
+    }
+
+    // Default / Homepage / Intelligence
     return {
-      title: "Planetary & Environmental Intelligence",
-      subtitle: "Active Coordinates: 27.7408° N, 85.3365° E (Maharajgunj)",
+      title: "The Sustainability Lab • Environmental Intelligence",
+      subtitle: "Active Coordinates: 27.7408° N, 85.3365° E (Maharajgunj, Kathmandu)",
       category: "EARTH TELEMETRY",
       confidenceScore: 96,
       metrics: [

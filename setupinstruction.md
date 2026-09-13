@@ -62,6 +62,7 @@ Edit `.env.local` to select and configure your preferred provider.
 
 | Provider | Ideal For | Key Required | Default Model |
 |---|---|---|---|
+| **Groq** | Ultra-Fast Cloud Inference (<1s), Llama 3.3 70B, GPT-OSS | `GROQ_API_KEY` (or `gsk_...` in `OPENAI_API_KEY`) | `openai/gpt-oss-120b` |
 | **Ollama** | 100% Free, Private, Local Offline Execution | None | `llama3.2` |
 | **OpenRouter** | Access to Claude 3.5, Llama 3.3 70B, DeepSeek R1 | `OPENROUTER_API_KEY` | `meta-llama/llama-3.3-70b-instruct` |
 | **OpenAI (ChatGPT)** | Reliable GPT-4o / GPT-4o-mini | `OPENAI_API_KEY` | `gpt-4o-mini` |
@@ -251,7 +252,7 @@ Create a containerized instance ready for AWS ECS, Google Cloud Run, or any VPS:
    docker run -d -p 3000:3000 \
      -e LLM_PROVIDER="openrouter" \
      -e OPENROUTER_API_KEY="your-key" \
-     -e NEXT_PUBLIC_SITE_URL="https://sustainabilitylab.org" \
+     -e NEXT_PUBLIC_SITE_URL="https://sustainabilitylab.xyz" \
      --name suslab \
      sustainability-lab:latest
    ```
@@ -299,7 +300,7 @@ Create a containerized instance ready for AWS ECS, Google Cloud Run, or any VPS:
    Create `/etc/nginx/sites-available/sustainabilitylab`:
    ```nginx
    server {
-       server_name sustainabilitylab.org www.sustainabilitylab.org;
+       server_name sustainabilitylab.xyz www.sustainabilitylab.xyz;
 
        location / {
            proxy_pass http://127.0.0.1:3000;
@@ -319,7 +320,7 @@ Create a containerized instance ready for AWS ECS, Google Cloud Run, or any VPS:
    sudo ln -s /etc/nginx/sites-available/sustainabilitylab /etc/nginx/sites-enabled/
    sudo nginx -t && sudo systemctl reload nginx
    sudo apt install certbot python3-certbot-nginx -y
-   sudo certbot --nginx -d sustainabilitylab.org -d www.sustainabilitylab.org
+   sudo certbot --nginx -d sustainabilitylab.xyz -d www.sustainabilitylab.xyz
    ```
 
 ---
@@ -337,5 +338,5 @@ The site automatically ships with search and answer engine optimization:
 ## 8. Support & Directorate Contact
 
 - **Headquarters**: Maharajgunj Research Station, Kathmandu Valley, Nepal
-- **Email**: hello@sustainabilitylab.org
-- **Website**: [https://sustainabilitylab.org](https://sustainabilitylab.org)
+- **Email**: hello@sustainabilitylab.xyz
+- **Website**: [https://sustainabilitylab.xyz](https://sustainabilitylab.xyz)

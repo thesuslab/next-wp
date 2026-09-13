@@ -7,5 +7,5 @@ type SiteConfig = {
 export const siteConfig: SiteConfig = {
   site_name: "Sustainability Lab",
   site_description: "Intelligence for a resilient future.",
-  site_domain: "https://sustainabilitylab.org",
+  site_domain: "https://sustainabilitylab.xyz",
 };
