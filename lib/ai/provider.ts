@@ -2,6 +2,8 @@ export type LLMProvider =
   | "openrouter"
   | "openai"
   | "chatgpt"
+  | "groq"
+  | "grok"
   | "gemini"
   | "nvidia"
   | "ollama"
@@ -24,6 +26,8 @@ const DEFAULT_MODELS: Record<string, string> = {
   openrouter: "meta-llama/llama-3.3-70b-instruct",
   openai: "gpt-4o-mini",
   chatgpt: "gpt-4o-mini",
+  groq: "openai/gpt-oss-120b",
+  grok: "grok-2-latest",
   gemini: "gemini-1.5-flash",
   nvidia: "meta/llama-3.1-70b-instruct",
   ollama: "llama3.2",
@@ -33,7 +37,8 @@ const DEFAULT_MODELS: Record<string, string> = {
  * Resolve active LLM provider and credentials from environment variables.
  */
 export function getActiveAIConfig(): AIProviderConfig {
-  const explicitProvider = (process.env.LLM_PROVIDER || "").toLowerCase().trim();
+  const rawProvider = (process.env.LLM_PROVIDER || "").toLowerCase().trim();
+  const explicitProvider = rawProvider === "auto" ? "" : rawProvider;
 
   // 1. Explicit provider check
   if (explicitProvider === "openrouter" || (!explicitProvider && process.env.OPENROUTER_API_KEY)) {
@@ -47,16 +52,61 @@ export function getActiveAIConfig(): AIProviderConfig {
     };
   }
 
+  // 2. Groq (native key or gsk_ key configured under OPENAI_API_KEY)
+  const groqKey =
+    process.env.GROQ_API_KEY ||
+    (process.env.OPENAI_API_KEY?.startsWith("gsk_") ? process.env.OPENAI_API_KEY : "");
+  if (
+    explicitProvider === "groq" ||
+    (explicitProvider === "grok" && groqKey) ||
+    (!explicitProvider && groqKey)
+  ) {
+    return {
+      provider: "groq",
+      model:
+        process.env.LLM_MODEL ||
+        process.env.GROQ_MODEL ||
+        process.env.OPENAI_MODEL ||
+        DEFAULT_MODELS.groq,
+      endpoint: process.env.GROQ_BASE_URL || "https://api.groq.com/openai/v1/chat/completions",
+      isConfigured: Boolean(groqKey),
+      statusMessage: groqKey ? "Connected to Groq Cloud (Ultra-Fast Inference)" : "Missing GROQ_API_KEY",
+    };
+  }
+
+  // 3. xAI Grok (native key or xai- key configured under OPENAI_API_KEY)
+  const xaiKey =
+    process.env.XAI_API_KEY ||
+    (process.env.OPENAI_API_KEY?.startsWith("xai-") ? process.env.OPENAI_API_KEY : "");
+  if (
+    explicitProvider === "grok" ||
+    explicitProvider === "xai" ||
+    (!explicitProvider && xaiKey)
+  ) {
+    return {
+      provider: "grok",
+      model: process.env.LLM_MODEL || process.env.XAI_MODEL || DEFAULT_MODELS.grok,
+      endpoint: process.env.XAI_BASE_URL || "https://api.x.ai/v1/chat/completions",
+      isConfigured: Boolean(xaiKey),
+      statusMessage: xaiKey ? "Connected to xAI (Grok)" : "Missing XAI_API_KEY",
+    };
+  }
+
+  // 4. Standard OpenAI (or custom OpenAI-compatible endpoint)
   if (
     explicitProvider === "openai" ||
     explicitProvider === "chatgpt" ||
     (!explicitProvider && process.env.OPENAI_API_KEY)
   ) {
     const key = process.env.OPENAI_API_KEY;
+    const endpoint = process.env.OPENAI_BASE_URL
+      ? `${process.env.OPENAI_BASE_URL.replace(/\/+$/, "")}/chat/completions`
+      : "https://api.openai.com/v1/chat/completions";
+
     return {
       provider: "openai",
       model: process.env.LLM_MODEL || process.env.OPENAI_MODEL || DEFAULT_MODELS.openai,
-      endpoint: "https://api.openai.com/v1/chat/completions",
+      endpoint,
       isConfigured: Boolean(key),
       statusMessage: key ? "Connected to OpenAI (ChatGPT)" : "Missing OPENAI_API_KEY",
     };
@@ -168,7 +218,12 @@ export async function queryAIProvider(
   if (config.provider === "openrouter") {
     headers["Authorization"] = `Bearer ${process.env.OPENROUTER_API_KEY}`;
     headers["HTTP-Referer"] = "https://sustainabilitylab.org";
-    headers["X-Title"] = "Sustainability Lab Intelligence";
+  } else if (config.provider === "groq") {
+    const key = process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY;
+    headers["Authorization"] = `Bearer ${key}`;
+  } else if (config.provider === "grok") {
+    const key = process.env.XAI_API_KEY || process.env.OPENAI_API_KEY;
+    headers["Authorization"] = `Bearer ${key}`;
   } else if (config.provider === "openai" || config.provider === "chatgpt") {
     headers["Authorization"] = `Bearer ${process.env.OPENAI_API_KEY}`;
   } else if (config.provider === "gemini") {
