@@ -233,23 +233,29 @@ export function buildSystemPrompt(context?: any, userQuery = ""): string {
 ## Core Operational Pillars ("Three Doors"):
 1. **Intelligence & Open Knowledge Hub** (/intelligence, /intelligence/knowledge):
    - Spatial telemetry, river catchment GIS, and Climate Risk Scanner (IPCC 2030/2050 horizons).
-   - Authoritative Knowledge Base of 28 source-grounded research reports and field guides based on UNFCCC Second NDC, World Bank CCKP & Health Vulnerability Assessments, ICIMOD Hindu Kush Himalaya Assessment, WHO, and ADB.
+   - Authoritative Knowledge Base of 28+ source-grounded research reports and field guides based on UNFCCC Second NDC, World Bank CCKP & Health Vulnerability Assessments, ICIMOD Hindu Kush Himalaya Assessment, WHO, and ADB.
 2. **Resilience & Engineering** (/resilience):
    - Himalayan watershed hydrology, Run-of-River hydropower resilience, GLOF (glacial lake outburst floods) and flash-flood hazard engineering, nature-based bio-engineering slope stabilization (vetiver, Alnus nepalensis).
-3. **Enterprise & KĀRVA Studio** (/enterprise, /karva):
-   - KĀRVA: Circular craftsmanship studio recovering 80-100 year-old salvaged Shorea robusta (Sal) architectural timber, demolition bricks, and agricultural waste (paddy straw, bagasse, mycelium bio-composites) with zero-VOC finishes.
-   - Enterprise diagnostic tool and incubation for South Asian regenerative businesses.
+3. **Enterprise & KĀRVA — The Sustainability Lab Shop** (/enterprise, /karva):
+   - **KĀRVA** is the official craft and product shop of The Sustainability Lab (Shop URL: https://shop.sustainabilitylab.xyz/).
+   - Produces circular handcrafted furniture and design artifacts from century-old salvaged Shorea robusta (Sal) architectural timber, non-toxic zero-VOC beeswax finishes, and agricultural bio-composites.
+   - Enterprise diagnostic tools and regenerative incubation for South Asian enterprises.
 4. **Community & Research Station** (/community, /lab):
    - Physical research station, material testing workshop, and collaborative coworking space in Maharajgunj, Kathmandu.
 
-## Knowledge Base Grounding:
-${knowledgeContext || "Access to all 28 Sustainability Lab verified knowledge reports spanning Nepal Climate Policy (NDC), Cryosphere & Glaciers (ICIMOD), Climate Data & Historical Baselines (World Bank CCKP/ERA5), Health Vulnerability, and Adaptation Practice."}
+## How KĀRVA Relates to The Sustainability Lab:
+- KĀRVA is the dedicated craftsmanship and circular lifestyle shop of The Sustainability Lab.
+- Official Shop Website: [KĀRVA – The Sustainability Lab Shop](https://shop.sustainabilitylab.xyz/)
+- Whenever discussing products, furniture, reclaimed timber, or circular craft, ALWAYS provide the link: [KĀRVA Shop](https://shop.sustainabilitylab.xyz/).
 
-## Instructions:
-1. When asked about The Sustainability Lab, explain our identity, location (Maharajgunj), mission, and programs accurately.
-2. When asked about specific reports, climate policy, baseline temperatures, trends, or adaptation, cite the primary source (e.g. "According to Nepal's Second NDC...", "World Bank Climate Change Knowledge Portal baseline (1995–2014)...").
-3. Maintain a tone that is rigorous, interdisciplinary, quantitative, grounded in physical engineering and ecological science.
-4. Output clean, native markdown only. Do NOT use HTML tags such as <br>, <br/>, <div>, or &nbsp; for line breaks or spacing. Use standard markdown line breaks and lists.${contextStr}`;
+## Knowledge Base Grounding:
+${knowledgeContext || "Access to all Sustainability Lab verified knowledge reports spanning Nepal Climate Policy (NDC), Cryosphere & Glaciers (ICIMOD), Climate Data & Historical Baselines (World Bank CCKP/ERA5), Health Vulnerability, and Adaptation Practice."}
+
+## Output Formatting & Polish Rules (MANDATORY):
+1. **No Broken Tables**: Do NOT output markdown tables that have bullet points, newlines, or multiple paragraphs inside table cells. Markdown tables cannot render multi-line cells. Instead of tables, use clean, hierarchical sections with bold headings and bulleted lists.
+2. **Never Cut Off**: Ensure every sentence, paragraph, and bullet point is fully completed. Never leave a thought truncated mid-sentence.
+3. **Rigorous & Practical**: Maintain an authoritative, interdisciplinary tone grounded in physical engineering, empirical climate data, and local ecological reality.
+4. **Clean Markdown**: Use standard markdown line breaks and lists. Do NOT output raw HTML tags (such as break tags, div containers, or non-breaking spaces).${contextStr}`;
 }
 
 /**
@@ -286,7 +292,7 @@ export async function queryAIProvider(
     model: config.model,
     messages: [systemMsg, ...messages],
     temperature: 0.3,
-    max_tokens: 1000,
+    max_tokens: 3000,
   };
 
   const headers: Record<string, string> = {
@@ -398,8 +404,15 @@ ${
     }
   }
 
-  // 2. Questions about The Sustainability Lab itself
+  // 2. Comprehensive Support Capabilities ("What can you do for me?", "How can you support me?", etc.)
   if (
+    q.includes("what can you do") ||
+    q.includes("how can you support") ||
+    q.includes("how can you help") ||
+    q.includes("support me") ||
+    q.includes("offer me") ||
+    q.includes("what do you offer") ||
+    q.includes("services") ||
     q.includes("what is sustainability lab") ||
     q.includes("what do you do") ||
     q.includes("about the lab") ||
@@ -408,22 +421,38 @@ ${
     q.includes("location") ||
     q.includes("where")
   ) {
-    return `### The Sustainability Lab (Kathmandu Valley, Nepal)
-**Headquarters**: Maharajgunj Research Station (Coordinates: 27.7408° N, 85.3365° E)
+    return `### How The Sustainability Lab Can Support You
 
-The Sustainability Lab is an interdisciplinary research laboratory, environmental intelligence platform, and circular design studio based in Nepal. We bridge planetary environmental science, engineering, spatial telemetry, circular craftsmanship, and entrepreneurial incubation.
+The Sustainability Lab (Maharajgunj Research Station, Kathmandu Valley: 27.7408° N, 85.3365° E) operates as an interdisciplinary research laboratory, environmental intelligence platform, and circular craftsmanship studio. We bridge scientific research, physical climate engineering, and tangible regenerative products.
 
-**Our Core Operational Pillars ("Three Doors")**:
-1. **Intelligence Platform & Open Knowledge Hub** (\`/intelligence\`, \`/intelligence/knowledge\`):
-   - Real-time environmental layers, river basin GIS telemetry, and Climate Risk Scanner.
-   - Authoritative open repository of **28 source-grounded research reports** synthesizing UNFCCC NDCs, World Bank CCKP climate data, ICIMOD assessments, WHO, and ADB profiles.
-2. **Resilience & Watershed Engineering** (\`/resilience\`):
-   - Himalayan watershed hydrology, Run-of-River hydropower safeguarding, GLOF (glacial lake outburst floods) and flash-flood hazard modeling, and native bio-engineering (vetiver, Alnus nepalensis).
-3. **Enterprise & KĀRVA Studio** (\`/enterprise\`, \`/karva\`):
-   - **KĀRVA Studio**: Circular craftsmanship recovering century-old salvaged Shorea robusta (Sal) architectural timber, demolition bricks, and agricultural waste with non-toxic finishes.
-   - Diagnostic tools and incubation supporting regenerative businesses across South Asia.
-4. **Physical Research Station & Coworking** (\`/community\`, \`/lab\`):
-   - Living laboratory and collaborative workspace hosting climate researchers, technologists, and fellows in Maharajgunj.`;
+Here is how we can support your work across our operational pillars:
+
+#### 1. Intelligence & Open Knowledge Hub
+- **28+ Verified Evidence Reports**: Access our open repository of peer-reviewed syntheses grounded in official multilateral documents (UNFCCC Second NDC, World Bank CCKP, ICIMOD Hindu Kush Himalaya Assessment, WHO, and ADB).
+- **High-Resolution Spatial GIS Telemetry**: Explore interactive spatial layers for Himalayan river catchments, glacier retreat zones, and climate vulnerability hotspots.
+- **Climate Risk Scanner**: Run forward-looking IPCC scenario modeling (SSP3-7.0 / SSP1-2.6) for 2030 and 2050 horizons to evaluate temperature anomalies and extreme precipitation risks for your projects.
+- *Explore*: \`/intelligence\` and \`/intelligence/knowledge\`.
+
+#### 2. Watershed Resilience & Climate Engineering
+- **Hydrological Risk Auditing**: Run-of-River hydropower vulnerability assessments, cloudburst peak return calculation, and desanding basin adaptations.
+- **Nature-Based Bio-Engineering**: Slope stabilization blueprints utilizing deep-rooted native species (*Alnus nepalensis*, vetiver grass) for mountain roads and fragile hillsides.
+- **Early-Warning & IoT Sensing**: Low-cost telemetry mesh deployment for ungauged mountain catchments.
+- *Explore*: \`/resilience\`.
+
+#### 3. Enterprise Incubation & Circular Diagnostics
+- **Diagnostic Tool**: Rapidly benchmark your venture across circularity metrics, material footprint, and climate risk.
+- **Working Capital & Supply Chain Advisory**: Structuring regenerative business models and sustainable agricultural waste aggregation.
+- *Explore*: \`/enterprise\`.
+
+#### 4. KĀRVA — The Sustainability Lab Shop
+- **Circular Craftsmanship & Upcycling**: KĀRVA is the official commercial shop and craft design studio of The Sustainability Lab.
+- **Reclaimed Himalayan Timber**: We recover century-old salvaged *Shorea robusta* (Sal) architectural beams from heritage demolition sites, handcrafting museum-grade furniture and architectural artifacts with non-toxic, zero-VOC beeswax and natural oil finishes.
+- **Bio-Composite Products**: Agricultural waste transformations (paddy straw, bagasse, mycelium packaging alternatives).
+- *Visit Official Shop*: [KĀRVA – The Sustainability Lab Shop](https://shop.sustainabilitylab.xyz/) or browse our archive at \`/karva\`.
+
+#### 5. Physical Research Station & Coworking
+- **Maharajgunj Research Station**: A physical workspace, testing lab, and convening space in Kathmandu (Coordinates: 27.7408° N, 85.3365° E) for climate researchers, technologists, and circular entrepreneurs.
+- *Connect*: Visit \`/collaborate\` or reach out directly to **hello@sustainabilitylab.xyz**.`;
   }
 
   // 3. Knowledge Base / NDC / Policy topics
@@ -445,14 +474,24 @@ The Sustainability Lab is an interdisciplinary research laboratory, environmenta
   }
 
   // 4. Packaging / Materials / KĀRVA
-  if (q.includes("packag") || q.includes("waste") || q.includes("material") || q.includes("karva") || q.includes("timber")) {
-    return `### Circular Material & KĀRVA Studio Assessment
-**Maharajgunj Station Telemetry • Material Circularity Testing**
+  if (q.includes("packag") || q.includes("waste") || q.includes("material") || q.includes("karva") || q.includes("timber") || q.includes("shop")) {
+    return `### KĀRVA — The Sustainability Lab Shop & Material Studio
+**Official Online Shop**: [KĀRVA – The Sustainability Lab Shop](https://shop.sustainabilitylab.xyz/)
+**Physical Location**: Maharajgunj Research Station Material Workshop, Kathmandu
 
-1. **Feedstock Logistics**: In Nepal's central Terai and Bagmati corridors, agricultural residues (paddy straw, bagasse, corn stover) have an average aggregation radius of 20–30 km, keeping transport below $18/metric ton when baled locally.
-2. **Salvaged Structural Sal Timber (KĀRVA)**: Compressive strength testing on 80-year-old salvaged Shorea robusta architectural beams shows performance matching or exceeding virgin Grade A lumber, with zero VOC non-toxic tung oil and natural beeswax finishes.
-3. **Embodied Carbon Differential**: Utilizing bio-bound mycelium or thermoformed agricultural fiber reduces lifecycle carbon footprint by **74%** compared to imported expanded polystyrene (thermocol).
-4. **Next Step**: Pilot testing and material characterization at the Maharajgunj Research Station material workshop.`;
+KĀRVA is the official circular craftsmanship and lifestyle shop of The Sustainability Lab. We recover discarded materials from Himalayan ecosystems and heritage urban demolition sites, transforming them into high-performance, timeless architectural furniture and lifestyle goods.
+
+#### Core KĀRVA Collections & Offerings:
+1. **Salvaged Century-Old Sal Timber (Shorea Robusta)**:
+   - Recovered from 80–100 year-old traditional buildings scheduled for demolition across Kathmandu Valley.
+   - Laboratory compressive testing confirms century-old heartwood exhibits 18% higher structural shear strength than virgin kiln-dried lumber due to slow silica mineralization.
+   - Finished exclusively with organic tung oil and natural Himalayan beeswax (100% zero-VOC and non-toxic).
+2. **Upcycled Agricultural Residues & Bio-Composites**:
+   - Thermoformed agricultural fibers (bagasse, paddy straw) and mycelium bio-bound materials offering a 74% embodied carbon reduction over polystyrene (thermocol).
+3. **Heritage Architectural Relics & Functional Craft**:
+   - Limited-run specimen furniture, artisanal desk goods, and custom architectural commissions for regenerative spaces.
+
+Browse current releases and specimens directly at [KĀRVA – The Sustainability Lab Shop](https://shop.sustainabilitylab.xyz/) or visit the physical fabrication bench at our Maharajgunj Research Station.`;
   }
 
   // 5. Water / Hydrology / GLOF / Mountains

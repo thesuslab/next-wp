@@ -133,7 +133,7 @@ export default function KarvaPage() {
           </div>
 
           {/* Subnavigation */}
-          <nav className="flex items-center gap-4 sm:gap-6 text-xs font-mono">
+          <nav className="flex items-center gap-3 sm:gap-5 text-xs font-mono">
             <Link href="/karva" className="text-white font-semibold border-b-2 border-[#B8926A] pb-1">
               Overview
             </Link>
@@ -146,7 +146,15 @@ export default function KarvaPage() {
             <Link href="/karva/stories" className="text-white/50 hover:text-white transition-colors pb-1">
               Stories
             </Link>
-            <Link href="/" className="text-white/40 hover:text-white transition-colors ml-2">
+            <a
+              href="https://shop.sustainabilitylab.xyz/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1 rounded-full bg-[#B8926A] text-black font-semibold hover:bg-white transition-colors flex items-center gap-1 text-[11px]"
+            >
+              Shop Online ↗
+            </a>
+            <Link href="/" className="text-white/40 hover:text-white transition-colors ml-1">
               Return to Lab →
             </Link>
           </nav>
@@ -163,18 +171,27 @@ export default function KarvaPage() {
               <span className="font-serif italic text-[#B8926A]">CAN STILL HAVE A FUTURE.</span>
             </h1>
             <p className="text-base sm:text-lg text-white/70 font-light leading-relaxed max-w-2xl mb-8">
-              KĀRVA is our physical craft and materials laboratory in Nepal. We rescue architectural salvage, century-old heritage timber, and agricultural byproducts — turning discarded matter into enduring, high-performance objects.
+              KĀRVA is our physical craft and materials laboratory in Nepal, producing circular furniture and lifestyle goods available at our dedicated online shop: <a href="https://shop.sustainabilitylab.xyz/" target="_blank" rel="noopener noreferrer" className="text-[#B8926A] underline underline-offset-4 hover:text-white">shop.sustainabilitylab.xyz</a>. We rescue architectural salvage, century-old heritage timber, and agricultural byproducts — turning discarded matter into enduring, high-performance objects.
             </p>
             <div className="flex flex-wrap items-center gap-4 font-mono text-xs">
               <a
-                href="#gallery"
-                className="px-5 py-3 rounded-lg bg-[#B8926A] text-black font-bold uppercase tracking-wider hover:bg-[#B8926A]/90 transition-all shadow-[0_0_20px_rgba(184,146,106,0.25)]"
+                href="https://shop.sustainabilitylab.xyz/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-3 rounded-xl bg-[#B8926A] text-black font-bold uppercase tracking-wider hover:bg-white transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(184,146,106,0.3)]"
               >
-                Inspect Visual Archive ↓
+                <span>Visit KĀRVA Shop</span>
+                <span>↗</span>
+              </a>
+              <a
+                href="#gallery"
+                className="px-5 py-3 rounded-xl bg-white/5 border border-white/15 text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
+              >
+                Inspect Specimen Gallery ↓
               </a>
               <Link
-                href="/collaborate/contact"
-                className="px-5 py-3 rounded-lg bg-white/5 border border-white/10 text-white/80 hover:text-white hover:border-white/30 transition-all uppercase tracking-wider"
+                href="/collaborate"
+                className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-white/80 hover:text-white hover:border-white/30 transition-all uppercase tracking-wider"
               >
                 Commission a Piece →
               </Link>

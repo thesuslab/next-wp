@@ -68,6 +68,7 @@ export const navigation: NavSection[] = [
     href: "/karva",
     children: [
       { label: "About KĀRVA", href: "/karva" },
+      { label: "Shop Online ↗", href: "https://shop.sustainabilitylab.xyz/" },
       { label: "Materials", href: "/karva/materials" },
       { label: "Products / Experiments", href: "/karva/products" },
       { label: "Stories", href: "/karva/stories" },

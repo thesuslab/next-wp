@@ -120,14 +120,22 @@ export function KarvaSection() {
               ))}
             </div>
 
-            <div className="mt-10">
+            <div className="mt-10 flex flex-wrap items-center gap-6">
               <Link
                 href="/karva"
                 className="inline-flex items-center gap-2 text-sm font-display font-medium tracking-[0.1em] uppercase text-[hsl(28,35%,57%)] hover:text-bamboo-light transition-colors duration-300"
               >
-                Enter KĀRVA
+                Enter KĀRVA Archive
                 <span className="text-lg">→</span>
               </Link>
+              <a
+                href="https://shop.sustainabilitylab.xyz/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#B8926A] text-black text-xs font-mono font-bold tracking-wider uppercase hover:bg-white transition-all shadow-[0_0_15px_rgba(184,146,106,0.25)]"
+              >
+                Visit KĀRVA Shop ↗
+              </a>
             </div>
           </div>
 
