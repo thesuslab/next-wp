@@ -171,7 +171,7 @@ function AIAdvisorInner() {
             <span className="text-white/20">|</span>
             <span className="text-xs font-mono text-[#00D4AA] uppercase tracking-wider flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#00D4AA] animate-pulse" />
-              SUSTAINABILITY LAB • AUTONOMOUS INTELLIGENCE ADVISOR
+              SUSTAINABILITY LAB • SUSTAINABLE AI ADVISOR
             </span>
           </div>
 
@@ -338,12 +338,12 @@ function AIAdvisorInner() {
                   <h3 className="text-sm font-semibold text-white mb-1">
                     {activeTab === "knowledge" && activeArticle
                       ? `Inquire about "${activeArticle.title}"`
-                      : "Autonomous Environmental Intelligence Advisor"}
+                      : "Sustainable AI Advisor (Lab Lens)"}
                   </h3>
                   <p className="text-xs text-white/50 max-w-md mb-6 leading-relaxed">
                     {activeTab === "knowledge" && activeArticle
                       ? `This report is published by ${activeArticle.source.name} (${activeArticle.source.date}). Ask about specific quantitative projections, policy mandates, or implementation barriers.`
-                      : "Pose any question regarding watershed hydrology, climate risk projections, circular material engineering, or project compliance."}
+                      : "Pose any question regarding watershed hydrology, climate risk projections, circular material engineering, or newly published dispatches."}
                   </p>
 
                   <div className="flex flex-wrap gap-2 justify-center max-w-lg">

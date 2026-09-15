@@ -83,7 +83,7 @@ export function LabLensHUD() {
       <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={toggleLens}
-          aria-label="Toggle Sustainability Lab Intelligence Lens"
+          aria-label="Toggle Sustainable AI Lab Lens"
           className={`group flex items-center gap-3 px-4 py-2.5 rounded-full border text-xs font-mono tracking-wider transition-all duration-300 shadow-2xl backdrop-blur-md ${
             isOpen
               ? "bg-bamboo text-white border-bamboo shadow-[0_0_25px_rgba(124,159,46,0.4)]"
@@ -95,9 +95,9 @@ export function LabLensHUD() {
               isOpen ? "bg-white animate-ping" : "bg-bamboo animate-pulse"
             }`}
           />
-          <span className="font-semibold">◉ LAB LENS</span>
+          <span className="font-semibold tracking-wider">◉ SUSTAINABLE AI</span>
           <span className="text-[10px] opacity-70 px-1.5 py-0.5 rounded bg-black/20">
-            {isOpen ? "ACTIVE" : "INSPECT"}
+            {isOpen ? "ACTIVE" : "LAB LENS"}
           </span>
         </button>
       </div>
@@ -106,7 +106,7 @@ export function LabLensHUD() {
       {isOpen && (
         <div
           role="dialog"
-          aria-label="Lab Lens Intelligence HUD"
+          aria-label="Sustainable AI Lab Lens HUD"
           className="fixed inset-x-0 bottom-0 z-40 max-h-[88vh] bg-[#1A1A18]/98 border-t border-bamboo/40 text-[#F7F5F0] backdrop-blur-2xl shadow-[0_-15px_40px_rgba(0,0,0,0.7)] overflow-y-auto animate-in slide-in-from-bottom duration-300"
         >
           <div className="max-w-7xl mx-auto px-6 py-8">
@@ -124,7 +124,7 @@ export function LabLensHUD() {
                   {/* Station Intelligence Badge */}
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-bamboo/30 bg-bamboo/10 text-bamboo-light uppercase flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-bamboo animate-pulse" />
-                    LAB INTELLIGENCE ACTIVE
+                    SUSTAINABLE AI ACTIVE
                   </span>
                 </div>
 
@@ -146,7 +146,7 @@ export function LabLensHUD() {
                   disabled={isAiLoading}
                   className="text-xs font-mono bg-bamboo/20 text-bamboo hover:bg-bamboo hover:text-white border border-bamboo/40 px-3 py-1.5 rounded transition-all duration-200 disabled:opacity-50"
                 >
-                  {isAiLoading ? "Synthesizing..." : "⚡ Live AI Diagnosis"}
+                  {isAiLoading ? "Synthesizing..." : "⚡ Live Sustainable AI"}
                 </button>
 
                 <Link
@@ -154,7 +154,7 @@ export function LabLensHUD() {
                   onClick={() => toggleLens()}
                   className="text-xs font-mono text-white/80 border border-white/20 hover:bg-white/10 px-3 py-1.5 rounded transition-colors"
                 >
-                  Full AI Advisor →
+                  Sustainable AI Advisor →
                 </Link>
 
                 <button
@@ -210,7 +210,7 @@ export function LabLensHUD() {
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-bamboo animate-ping" />
                     <span className="text-xs font-mono text-bamboo font-semibold uppercase tracking-wider">
-                      Environmental Intelligence Synthesis
+                      Sustainable AI Synthesis
                     </span>
                   </div>
                   <button
@@ -224,7 +224,7 @@ export function LabLensHUD() {
                 {isAiLoading ? (
                   <div className="flex items-center gap-3 py-4 text-xs font-mono text-bamboo">
                     <span className="w-4 h-4 border-2 border-bamboo border-t-transparent rounded-full animate-spin" />
-                    <span>Synthesizing environmental intelligence with page telemetry...</span>
+                    <span>Synthesizing Sustainable AI environmental intelligence with page telemetry...</span>
                   </div>
                 ) : (
                   <div className="text-xs leading-relaxed text-white/90 whitespace-pre-line font-sans space-y-2">
@@ -239,7 +239,7 @@ export function LabLensHUD() {
               {/* Left: Key Insights (6 cols) */}
               <div className="lg:col-span-6">
                 <h4 className="text-xs font-mono text-bamboo uppercase tracking-wider mb-2">
-                  Key Vectorized Insights
+                  Sustainable AI Vectorized Insights
                 </h4>
                 <ul className="space-y-1.5 text-xs text-white/70">
                   {activeContext.insights.map((insight, i) => (
@@ -264,7 +264,7 @@ export function LabLensHUD() {
                     type="text"
                     value={aiInput}
                     onChange={(e) => setAiInput(e.target.value)}
-                    placeholder="Ask Lab Lens (e.g. 'What slope failure risks apply here?')..."
+                    placeholder="Ask Sustainable AI (e.g. 'What slope failure risks apply here?')..."
                     className="flex-1 px-3 py-2 rounded-lg bg-black/60 border border-white/20 text-xs text-white placeholder:text-white/40 focus:border-bamboo focus:outline-none font-mono"
                   />
                   <button

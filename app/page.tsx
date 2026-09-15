@@ -24,9 +24,9 @@ const HOME_FAQ_ITEMS = [
       "The Sustainability Lab's primary research station, material workshop, and community coworking hub are located in Maharajgunj, Kathmandu Valley, Nepal (Coordinates: 27.7408° N, 85.3365° E).",
   },
   {
-    question: "What is the Lab Lens?",
+    question: "What is Sustainable AI (Lab Lens)?",
     answer:
-      "The Lab Lens is a persistent, sitewide intelligence HUD that provides real-time environmental, climate hazard, and biodiversity telemetry for every domain explored across the platform.",
+      "Sustainable AI (Lab Lens) is the Sustainability Lab's persistent sitewide intelligence HUD and autonomous advisor. It delivers real-time environmental, climate hazard, and biodiversity telemetry grounded in verified evidence and newly published dispatches for every domain explored across the platform.",
   },
   {
     question: "How does the Sustainability Lab collaborate with external organizations?",

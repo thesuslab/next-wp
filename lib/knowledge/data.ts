@@ -1,3 +1,5 @@
+import { getStoredEditorialArticles } from "../editorial/store";
+
 export interface KnowledgeSource {
   name: string;
   url: string;
@@ -595,19 +597,15 @@ The most humane intervention is often the one that reduces exposure while expand
  * with newly ingested and verified editorial articles on the server.
  */
 export function getAllKnowledgeEntries(): KnowledgeEntry[] {
-  if (typeof window === "undefined") {
-    try {
-      // Dynamically load server-side stored editorial articles
-      const { getStoredEditorialArticles } = require("@/lib/editorial/store");
-      const stored = getStoredEditorialArticles();
-      if (Array.isArray(stored) && stored.length > 0) {
-        const seen = new Set(knowledgeEntries.map((e) => e.slug));
-        const unique = stored.filter((e: KnowledgeEntry) => !seen.has(e.slug));
-        return [...unique, ...knowledgeEntries];
-      }
-    } catch {
-      // Fallback cleanly to static baseline
+  try {
+    const stored = getStoredEditorialArticles();
+    if (Array.isArray(stored) && stored.length > 0) {
+      const seen = new Set(knowledgeEntries.map((e) => e.slug));
+      const unique = stored.filter((e: KnowledgeEntry) => !seen.has(e.slug));
+      return [...unique, ...knowledgeEntries];
     }
+  } catch (err: any) {
+    console.warn("[Knowledge Base] Dynamic article load warning:", err?.message);
   }
   return knowledgeEntries;
 }
@@ -648,4 +646,79 @@ export function getRelatedKnowledgeEntries(slug: string, limit = 3): KnowledgeEn
 export function getKnowledgeTopics(): string[] {
   return Array.from(new Set(getAllKnowledgeEntries().map((e) => e.topic))).sort();
 }
+
+const STOP_WORDS = new Set([
+  "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "aren't",
+  "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by",
+  "can", "can't", "cannot", "could", "couldn't", "did", "didn't", "do", "does", "doesn't", "doing",
+  "don't", "down", "during", "each", "few", "for", "from", "further", "had", "hadn't", "has", "hasn't",
+  "have", "haven't", "having", "he", "her", "here", "hers", "herself", "him", "himself", "his", "how",
+  "i", "if", "in", "into", "is", "isn't", "it", "it's", "its", "itself", "let's", "me", "more", "most",
+  "my", "myself", "no", "nor", "not", "of", "off", "on", "once", "only", "or", "other", "ought", "our",
+  "ours", "ourselves", "out", "over", "own", "same", "she", "should", "so", "some", "such", "than",
+  "that", "the", "their", "theirs", "them", "themselves", "then", "there", "these", "they", "this",
+  "those", "through", "to", "too", "under", "until", "up", "very", "was", "wasn't", "we", "were", "what",
+  "when", "where", "which", "while", "who", "whom", "why", "with", "would", "you", "your", "yours",
+  // Common conversational / non-domain words
+  "world", "first", "last", "give", "make", "take", "like", "tell", "know", "year", "time", "day",
+  "state", "many", "much", "good", "new", "well", "code", "write", "play", "game", "recipe", "cook",
+  "capital", "city", "people", "person", "need", "help", "want", "look", "think", "come", "went"
+]);
+
+/**
+ * Search & rank knowledge entries based on relevance to a query.
+ * Matches across titles, summaries, tags, topics, source names, and bodies.
+ * Automatically incorporates freshly published editorial and WordPress articles.
+ */
+export function searchKnowledgeEntries(query: string, limit = 4): KnowledgeEntry[] {
+  const cleanQ = (query || "").toLowerCase().trim();
+  if (!cleanQ) return [];
+
+  const all = getAllKnowledgeEntries();
+
+  // Extract meaningful search tokens
+  const tokens = cleanQ
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .split(/\s+/)
+    .filter((t) => t.length >= 3 && !STOP_WORDS.has(t));
+
+  const scored = all.map((entry) => {
+    let score = 0;
+    const titleLower = entry.title.toLowerCase();
+    const summaryLower = entry.summary.toLowerCase();
+    const bodyLower = entry.body.toLowerCase();
+    const topicLower = entry.topic.toLowerCase();
+    const categoryLower = entry.category.toLowerCase();
+    const sourceLower = entry.source.name.toLowerCase();
+    const tagsLower = entry.tags.map((t) => t.toLowerCase());
+
+    // 1. Exact phrase match bonuses
+    if (titleLower.includes(cleanQ)) score += 35;
+    if (summaryLower.includes(cleanQ)) score += 18;
+
+    // 2. Token matches
+    for (const token of tokens) {
+      if (titleLower.includes(token)) score += 8;
+      if (tagsLower.some((t) => t.includes(token))) score += 6;
+      if (topicLower.includes(token) || categoryLower.includes(token)) score += 5;
+      if (summaryLower.includes(token)) score += 4;
+      if (sourceLower.includes(token)) score += 3;
+      if (bodyLower.includes(token)) score += 2;
+    }
+
+    // 3. Recency boost for newly published articles
+    if (entry.id.startsWith("ed-") || entry.id.startsWith("wp-")) {
+      score += 4;
+    }
+
+    return { entry, score };
+  });
+
+  return scored
+    .filter((item) => item.score >= 8)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((item) => item.entry);
+}
+
 

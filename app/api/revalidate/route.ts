@@ -45,6 +45,20 @@ export async function POST(request: NextRequest) {
         revalidateTag("posts", { expire: 0 });
         if (contentId) {
           revalidateTag(`post-${contentId}`, { expire: 0 });
+          // Auto-index published post into Sustainable AI Advisor
+          try {
+            const { getPostById } = await import("@/lib/wordpress");
+            const { indexWordPressPost } = await import("@/lib/knowledge/indexer");
+            const post = await getPostById(Number(contentId));
+            if (post) {
+              indexWordPressPost(post);
+            }
+          } catch (indexErr: any) {
+            console.warn(
+              "[Revalidate] Could not auto-index WordPress post into AI Advisor:",
+              indexErr?.message
+            );
+          }
         }
         // Clear all post pages when any post changes
         revalidateTag("posts-page-1", { expire: 0 });

@@ -78,7 +78,7 @@ export function Nav({ className, children, id }: NavProps) {
             </div>
             <button
               onClick={toggleLens}
-              aria-label="Toggle Lab Lens Intelligence"
+              aria-label="Toggle Sustainable AI Lab Lens"
               className={cn(
                 "hidden xl:inline-flex items-center gap-2 px-3 py-1.5 text-[11px] font-mono tracking-wider uppercase border transition-all duration-200 ml-2 rounded-full",
                 isOpen
@@ -87,7 +87,7 @@ export function Nav({ className, children, id }: NavProps) {
               )}
             >
               <span className={cn("w-1.5 h-1.5 rounded-full", isOpen ? "bg-black" : "bg-data animate-pulse")} />
-              <span>◉ LAB LENS</span>
+              <span>◉ SUSTAINABLE AI</span>
             </button>
             <Link
               href="/collaborate/contact"

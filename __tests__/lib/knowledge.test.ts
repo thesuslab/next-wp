@@ -8,9 +8,9 @@ import {
 } from "@/lib/knowledge/data";
 
 describe("Knowledge Base Data Layer", () => {
-  it("populates exactly 28 source-grounded entries from knowledge seed", () => {
+  it("populates source-grounded entries from knowledge seed and stored articles", () => {
     const entries = getAllKnowledgeEntries();
-    expect(entries).toHaveLength(28);
+    expect(entries.length).toBeGreaterThanOrEqual(28);
     expect(knowledgeEntries).toHaveLength(28);
   });
 

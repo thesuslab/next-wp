@@ -43,4 +43,47 @@ describe("AI Intelligence Provider & Grounding", () => {
     expect(response.text).toContain("https://shop.sustainabilitylab.xyz/");
     expect(response.text).toContain("Shorea Robusta");
   });
+
+  it("brands the system prompt with Sustainable AI Advisor and dynamic knowledge indexing", () => {
+    const prompt = buildSystemPrompt(null, "general climate inquiry");
+    expect(prompt).toContain("Sustainable AI Advisor");
+    expect(prompt).toContain("Dynamic Knowledge Indexing");
+  });
+
+  it("grounds responses in published articles when queried", async () => {
+    const response = await queryAIProvider([
+      { role: "user", content: "what are the historical climate baseline figures for Nepal" },
+    ]);
+
+    expect(response.text).toBeTruthy();
+    expect(response.text).toContain("Historical Baseline");
+    expect(response.text).toContain("12.66 °C");
+  });
+
+  it("politely declines general / off-topic questions unrelated to the Sustainability Lab or climate", async () => {
+    const offTopicQueries = [
+      "Who won the FIFA World Cup in 2022?",
+      "Write python code to invert a binary tree",
+      "Can you give me a recipe for chocolate cake?",
+      "What is the capital city of France?",
+    ];
+
+    for (const query of offTopicQueries) {
+      const response = await queryAIProvider([{ role: "user", content: query }]);
+      expect(response.text).toContain("Out of Scope • Sustainable AI Advisor");
+      expect(response.text).toContain("specialized exclusively in environmental intelligence");
+      expect(response.status).toContain("Domain relevance enforced");
+    }
+  });
+
+  it("answers domain-specific questions about environmental risks and engineering", async () => {
+    const response = await queryAIProvider([
+      { role: "user", content: "what are the flood and GLOF mitigation engineering options" },
+    ]);
+
+    expect(response.text).toBeTruthy();
+    expect(response.text).not.toContain("Out of Scope");
+    expect(response.text).toContain("Himalayan Watershed");
+  });
 });
+

@@ -91,7 +91,7 @@ export function addEditorialArticle(article: KnowledgeEntry): boolean {
 }
 
 /**
- * Combines foundational 28 knowledge seed articles with dynamically scraped editorial articles.
+ * Combines baseline knowledge articles with dynamically scraped editorial articles.
  */
 export function getCombinedKnowledgeEntries(): KnowledgeEntry[] {
   const stored = getStoredEditorialArticles();
@@ -103,3 +103,4 @@ export function getCombinedKnowledgeEntries(): KnowledgeEntry[] {
 
   return [...newUnique, ...baseEntries];
 }
+

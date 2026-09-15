@@ -158,61 +158,56 @@ export function getActiveAIConfig(): AIProviderConfig {
 import {
   getAllKnowledgeEntries,
   getKnowledgeEntryBySlug,
+  searchKnowledgeEntries,
   type KnowledgeEntry,
 } from "../knowledge/data";
 
 /**
- * Retrieve matching Knowledge Base articles to ground AI responses.
+ * Retrieve matching Knowledge Base articles to ground Sustainable AI responses.
+ * Uses relevance scoring across titles, summaries, tags, topics, source names, and bodies.
  */
 export function findRelevantKnowledgeContext(
   query: string,
   articleSlug?: string
 ): string {
+  let contextOutput = "";
+
+  // 1. If active article slug is provided (user viewing a specific article), include it first
   if (articleSlug) {
-    const article = getKnowledgeEntryBySlug(articleSlug);
-    if (article) {
-      const dataStr = article.data ? `\n- Telemetry Metrics: ${JSON.stringify(article.data)}` : "";
-      return `### Active Knowledge Base Report Context:
-- Title: "${article.title}"
-- Slug: ${article.slug}
-- Topic: ${article.topic} | Category: ${article.category} | Kind: ${article.kind}
-- Primary Source: ${article.source.name} (${article.source.date})
-- Source URL: ${article.source.url}
-- Summary: ${article.summary}
+    const activeArticle = getKnowledgeEntryBySlug(articleSlug);
+    if (activeArticle) {
+      const dataStr = activeArticle.data ? `\n- Telemetry Metrics: ${JSON.stringify(activeArticle.data)}` : "";
+      contextOutput += `### Active Knowledge Base Report Context:
+- Title: "${activeArticle.title}"
+- Slug: ${activeArticle.slug}
+- Topic: ${activeArticle.topic} | Category: ${activeArticle.category} | Kind: ${activeArticle.kind}
+- Primary Source: ${activeArticle.source.name} (${activeArticle.source.date})
+- Source URL: ${activeArticle.source.url}
+- Summary: ${activeArticle.summary}
 - Full Body Extract:
-${article.body}${dataStr}
-`;
+${activeArticle.body}${dataStr}
+\n`;
     }
   }
 
-  const q = (query || "").toLowerCase();
-  if (!q.trim()) return "";
+  // 2. Search all indexed knowledge entries (including freshly published and editorial dispatches)
+  const matches = searchKnowledgeEntries(query, 3).filter((a) => a.slug !== articleSlug);
 
-  // Search entire knowledge base including freshly ingested editorial entries
-  const allEntries = getAllKnowledgeEntries();
-  const matches = allEntries.filter((art) => {
-    return (
-      art.title.toLowerCase().includes(q) ||
-      art.slug.toLowerCase().includes(q) ||
-      art.topic.toLowerCase().includes(q) ||
-      art.tags.some((t) => q.includes(t.toLowerCase())) ||
-      art.source.name.toLowerCase().includes(q)
-    );
-  });
-
-  if (matches.length === 0) return "";
-
-  const selected = matches.slice(0, 3);
-  return `### Relevant Verified Knowledge Base References:
-${selected
+  if (matches.length > 0) {
+    contextOutput += `### Relevant Verified Knowledge Base & Published Dispatches:
+${matches
   .map(
     (art) =>
       `• [${art.source.level.toUpperCase()}] "${art.title}" (${art.source.name}, ${art.source.date}):
   Summary: ${art.summary}
-  Body: ${art.body}
+  Body Extract: ${art.body.slice(0, 1200)}...
+  Source Citation: ${art.source.url}
   ${art.data ? `Data: ${JSON.stringify(art.data)}` : ""}`
   )
   .join("\n\n")}`;
+  }
+
+  return contextOutput.trim();
 }
 
 /**
@@ -223,7 +218,12 @@ export function buildSystemPrompt(context?: any, userQuery = ""): string {
   const knowledgeContext = findRelevantKnowledgeContext(userQuery, articleSlug);
   const contextStr = context ? `\nActive Page Telemetry: ${JSON.stringify(context, null, 2)}` : "";
 
-  return `You are the Sustainability Lab's Autonomous Intelligence Advisor and Lab Lens Engine.
+  return `You are the Sustainability Lab's Sustainable AI Advisor and Lab Lens Engine.
+
+## Sustainable AI Identity & Core Principles:
+- **Sustainable AI by Design**: You deliver high-density, actionable environmental intelligence with zero hallucination. Every recommendation is grounded in empirical physics, verified assessments, and published field reports.
+- **Dynamic Knowledge Indexing**: You have real-time access to the Sustainability Lab's authoritative knowledge base, including freshly published dispatches, institutional assessments (UNEP, ICIMOD, World Bank CCKP, UNFCCC, WHO, ADB), and spatial watershed telemetry.
+- **Attribution & Provenance**: Always cite the relevant reports, datasets, and field dispatches when synthesizing answers.
 
 ## Institutional Identity & Headquarters:
 - Name: The Sustainability Lab (Headquarters: Maharajgunj Research Station, Kathmandu Valley, Nepal).
@@ -233,7 +233,7 @@ export function buildSystemPrompt(context?: any, userQuery = ""): string {
 ## Core Operational Pillars ("Three Doors"):
 1. **Intelligence & Open Knowledge Hub** (/intelligence, /intelligence/knowledge):
    - Spatial telemetry, river catchment GIS, and Climate Risk Scanner (IPCC 2030/2050 horizons).
-   - Authoritative Knowledge Base of 28+ source-grounded research reports and field guides based on UNFCCC Second NDC, World Bank CCKP & Health Vulnerability Assessments, ICIMOD Hindu Kush Himalaya Assessment, WHO, and ADB.
+   - Authoritative Knowledge Base of source-grounded research reports and field guides based on UNFCCC Second NDC, World Bank CCKP & Health Vulnerability Assessments, ICIMOD Hindu Kush Himalaya Assessment, WHO, and ADB.
 2. **Resilience & Engineering** (/resilience):
    - Himalayan watershed hydrology, Run-of-River hydropower resilience, GLOF (glacial lake outburst floods) and flash-flood hazard engineering, nature-based bio-engineering slope stabilization (vetiver, Alnus nepalensis).
 3. **Enterprise & KĀRVA — The Sustainability Lab Shop** (/enterprise, /karva):
@@ -248,14 +248,149 @@ export function buildSystemPrompt(context?: any, userQuery = ""): string {
 - Official Shop Website: [KĀRVA – The Sustainability Lab Shop](https://shop.sustainabilitylab.xyz/)
 - Whenever discussing products, furniture, reclaimed timber, or circular craft, ALWAYS provide the link: [KĀRVA Shop](https://shop.sustainabilitylab.xyz/).
 
-## Knowledge Base Grounding:
-${knowledgeContext || "Access to all Sustainability Lab verified knowledge reports spanning Nepal Climate Policy (NDC), Cryosphere & Glaciers (ICIMOD), Climate Data & Historical Baselines (World Bank CCKP/ERA5), Health Vulnerability, and Adaptation Practice."}
+## Grounded Knowledge Base Context:
+${knowledgeContext || "Access to all Sustainability Lab verified knowledge reports spanning Nepal Climate Policy (NDC), Cryosphere & Glaciers (ICIMOD), Climate Data & Historical Baselines (World Bank CCKP/ERA5), Health Vulnerability, and Published Dispatches."}
+
+## STRICT DOMAIN RELEVANCE ENFORCEMENT (MANDATORY):
+- You are exclusively the Sustainability Lab's Sustainable AI Advisor.
+- You must ONLY answer questions that pertain to the Sustainability Lab, Maharajgunj Research Station, planetary science, environmental intelligence, climate change, watershed hydrology, cryosphere/GLOF hazards, infrastructure safeguards, circular design/timber craft (KĀRVA), and published reports.
+- If the user asks general, off-topic, or unrelated questions (e.g. general trivia, pop culture, sports, general programming/coding puzzles, entertainment, cooking recipes, general world history, or non-environmental queries):
+  You must politely decline to answer, state that as the Sustainability Lab's Sustainable AI Advisor you strictly focus on environmental science and climate resilience, and invite them to ask about our research, reports, or watershed data.
 
 ## Output Formatting & Polish Rules (MANDATORY):
-1. **No Broken Tables**: Do NOT output markdown tables that have bullet points, newlines, or multiple paragraphs inside table cells. Markdown tables cannot render multi-line cells. Instead of tables, use clean, hierarchical sections with bold headings and bulleted lists.
+1. **No Broken Tables**: Do NOT output markdown tables that have bullet points, newlines, or multiple paragraphs inside table cells. Use clean, hierarchical sections with bold headings and bulleted lists.
 2. **Never Cut Off**: Ensure every sentence, paragraph, and bullet point is fully completed. Never leave a thought truncated mid-sentence.
 3. **Rigorous & Practical**: Maintain an authoritative, interdisciplinary tone grounded in physical engineering, empirical climate data, and local ecological reality.
-4. **Clean Markdown**: Use standard markdown line breaks and lists. Do NOT output raw HTML tags (such as break tags, div containers, or non-breaking spaces).${contextStr}`;
+4. **Clean Markdown**: Use standard markdown line breaks and lists. Do NOT output raw HTML tags.${contextStr}`;
+}
+
+/**
+ * Keywords and domain terms that establish relevance to the Sustainability Lab,
+ * environmental intelligence, climate science, watershed engineering, or circular craft.
+ */
+const DOMAIN_RELEVANCE_PATTERNS = [
+  /sustainab/i,
+  /environ/i,
+  /climat/i,
+  /ecolog/i,
+  /resilien/i,
+  /watershed/i,
+  /hydrolog/i,
+  /water/i,
+  /flood/i,
+  /river/i,
+  /glacier/i,
+  /cryosphere/i,
+  /glof/i,
+  /himalay/i,
+  /nepal/i,
+  /kathmandu/i,
+  /maharajgunj/i,
+  /k[aā]rva/i,
+  /sal(\s+timber|\s+wood)?/i,
+  /timber/i,
+  /wood/i,
+  /biochar/i,
+  /biomass/i,
+  /biomaterial/i,
+  /carbon/i,
+  /emission/i,
+  /ndc/i,
+  /nap/i,
+  /ipcc/i,
+  /unfccc/i,
+  /unep/i,
+  /icimod/i,
+  /world\s*bank/i,
+  /soil/i,
+  /forest/i,
+  /hazard/i,
+  /risk/i,
+  /safeguard/i,
+  /eia/i,
+  /iee/i,
+  /alnus/i,
+  /vetiver/i,
+  /slope/i,
+  /landslide/i,
+  /sediment/i,
+  /temperature/i,
+  /precipitat/i,
+  /monsoon/i,
+  /weather/i,
+  /energy/i,
+  /solar/i,
+  /hydro/i,
+  /waste/i,
+  /circular/i,
+  /plastic/i,
+  /policy/i,
+  /governance/i,
+  /adaptation/i,
+  /mitigation/i,
+  /vulnerab/i,
+  /bagmati/i,
+  /koshi/i,
+  /gandaki/i,
+  /lab/i,
+  /lens/i,
+  /advisor/i,
+  /report/i,
+  /dispatch/i,
+  /article/i,
+  /telemetry/i,
+  /what\s+can\s+you\s+do/i,
+  /how\s+can\s+you\s+help/i,
+  /how\s+can\s+you\s+support/i,
+  /who\s+are\s+you/i,
+  /about/i,
+  /service/i,
+  /collaborat/i,
+  /contact/i,
+  /visit/i,
+  /research/i,
+];
+
+/**
+ * Validates whether a query is relevant to the Sustainability Lab's domain.
+ */
+export function isRelevantDomainQuery(query: string, context?: any): boolean {
+  if (!query || !query.trim()) return false;
+  // If user is currently looking at an article, knowledge page, or active context, allow context questions
+  if (context?.articleSlug || context?.article || context?.category || context?.title) {
+    return true;
+  }
+
+  // Check against domain patterns
+  if (DOMAIN_RELEVANCE_PATTERNS.some((pattern) => pattern.test(query))) {
+    return true;
+  }
+
+  // Check if query matches any indexed knowledge base articles
+  const matched = searchKnowledgeEntries(query, 1);
+  if (matched.length > 0) {
+    const top = matched[0];
+    const topTitleTokens = top.title.toLowerCase().split(/\s+/).filter((w) => w.length >= 4);
+    const queryLower = query.toLowerCase();
+    if (topTitleTokens.some((t) => queryLower.includes(t))) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export function getOutOfScopeResponse(): string {
+  return `### Out of Scope • Sustainable AI Advisor
+I am the Sustainability Lab's **Sustainable AI Advisor**, specialized exclusively in environmental intelligence, Himalayan climate resilience, watershed engineering, and circular craftsmanship.
+
+I can only assist with inquiries related to:
+- **Climate Science & Telemetry**: Nepal historical baselines, SSP3-7.0 projections, and cryosphere telemetry.
+- **Watershed & Engineering**: GLOF multi-hazard early warning, Run-of-River hydro safeguarding, and bio-engineering cut-slope stabilization.
+- **Circular Design & Craft**: Salvaged Shorea robusta (Sal) architectural timber and KĀRVA Studio artifacts.
+- **Published Dispatches**: Verified institutional reports and field dispatches published across the knowledge base.
+
+*Please pose an inquiry related to environmental science, climate adaptation, or Sustainability Lab research.*`;
 }
 
 /**
@@ -272,6 +407,16 @@ export async function queryAIProvider(
 }> {
   const config = getActiveAIConfig();
   const userQuery = messages[messages.length - 1]?.content || "";
+
+  // Reject off-topic / general questions
+  if (userQuery && !isRelevantDomainQuery(userQuery, context)) {
+    return {
+      provider: config.provider,
+      model: config.model,
+      status: "Domain relevance enforced: off-topic query declined.",
+      text: getOutOfScopeResponse(),
+    };
+  }
 
   // If simulation mode, return structured contextual synthesis
   if (config.provider === "simulation" || !config.isConfigured) {
@@ -523,14 +668,30 @@ Browse current releases and specimens directly at [KĀRVA – The Sustainability
 *Reference: Consult \`/intelligence/knowledge/nepal-historical-climate-baseline-1995-2014\` in the Knowledge Hub for the complete evidence ledger.*`;
   }
 
-  return `### Sustainability Lab Intelligence Synthesis
-**Maharajgunj Research Station • Active Intelligence Engine**
+  // 7. Dynamic synthesis grounded in newly indexed or published knowledge articles
+  const matchedEntries = searchKnowledgeEntries(query, 1);
+  if (matchedEntries.length > 0) {
+    const art = matchedEntries[0];
+    return `### Sustainable AI Synthesis: ${art.title}
+**Verified Knowledge Base Dispatch • Provenance: ${art.source.name} (${art.source.date})**
+*Topic: ${art.topic} • Category: ${art.category} • Evidence Level: ${art.source.level.toUpperCase()}*
 
-The Sustainability Lab combines planetary science, physical watershed engineering, spatial telemetry, and circular design across South Asia:
-- **Spatial Telemetry**: Catchment vulnerability and hazard exposure assessed across Gandaki, Koshi, and Bagmati river basins.
+1. **Executive Finding**: ${art.summary}
+2. **Context & Ingested Analysis**:
+${art.body}
+${art.data ? `\n3. **Empirical Telemetry**: ${JSON.stringify(art.data, null, 2)}` : ""}
+
+*Direct citation verified from [${art.source.name}](${art.source.url}).*`;
+  }
+
+  return `### Sustainable AI Intelligence Synthesis
+**Maharajgunj Research Station • Autonomous Sustainable AI Advisor**
+
+The Sustainability Lab pairs physical climate science, spatial watershed engineering, and verified knowledge indexing:
+- **Spatial Telemetry**: Catchment vulnerability and hazard exposure across Himalayan river basins.
 - **Physical Hardening**: Ductile engineering, bio-shield embankments, and decentralized municipal retention.
-- **Knowledge Library**: 28 open reports grounded in UNFCCC, World Bank, ICIMOD, WHO, and ADB assessments.
-- **KĀRVA Studio**: Reclaimed vernacular Sal timber and circular material innovation.
+- **Dynamic Knowledge Base**: All published dispatches and research reports are continuously indexed into this Sustainable AI Advisor.
+- **KĀRVA Studio**: Reclaimed vernacular Sal timber and circular biomaterial innovation.
 
-*Ask any specific question about our programs, or select any of the 28 Knowledge Base articles to chat directly with verified source documents.*`;
+*Ask any specific question about our programs, or select any published article to chat directly with verified source documents.*`;
 }

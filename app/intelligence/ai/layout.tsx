@@ -3,12 +3,14 @@ import { BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "AI Advisory Engine — Ask the Lab",
+  title: "Sustainable AI Advisor — Ask the Lab",
   description:
-    "Domain-specific decision intelligence assistant pairing real-world environmental data with contextual infrastructure and business modeling.",
+    "Sustainable AI decision intelligence assistant pairing real-world environmental data with contextual infrastructure, climate risk, and circular modeling.",
   path: "/intelligence/ai",
   keywords: [
-    "AI Advisory Engine",
+    "Sustainable AI",
+    "Sustainable AI Advisor",
+    "Lab Lens",
     "Environmental AI",
     "Ask the Lab",
     "Climate Decision Intelligence",
@@ -27,7 +29,7 @@ export default function AiLayout({
         items={[
           { name: "Home", url: "/" },
           { name: "Intelligence", url: "/intelligence" },
-          { name: "AI Advisory Engine", url: "/intelligence/ai" },
+          { name: "Sustainable AI Advisor", url: "/intelligence/ai" },
         ]}
       />
       {children}
