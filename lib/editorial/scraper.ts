@@ -88,17 +88,28 @@ export const VERIFIED_SOURCES: VerifiedSourceDefinition[] = [
  */
 export function cleanHtmlSnippet(raw: string): string {
   if (!raw) return "";
-  return raw
+  let text = raw
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+    .replace(/<!--[\s\S]*?-->/g, " ")
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "");
+
+  // Unescape common entities that may conceal comments or tags
+  text = text
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&amp;/gi, "&")
+    .replace(/&#039;/g, "'")
     .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"');
+
+  // Strip comments and remaining tags
+  text = text
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<[^>]+>/g, " ");
+
+  return text
+    .replace(/&nbsp;/g, " ")
     .replace(/&#8217;/g, "'")
     .replace(/&#8220;/g, '"')
     .replace(/&#8221;/g, '"')

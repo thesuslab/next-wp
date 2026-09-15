@@ -2,37 +2,45 @@
 
 import { useIntersectionObserver } from "@/lib/hooks/useIntersectionObserver";
 import Link from "next/link";
+import {
+  Sprout,
+  Microscope,
+  Zap,
+  Sparkles,
+  Building2,
+  Compass,
+} from "lucide-react";
 
 const COMMUNITY_CARDS = [
   {
     title: "Climate entrepreneurs",
     description: "Build your company.",
-    icon: "🌱",
+    icon: Sprout,
   },
   {
     title: "Researchers",
     description: "Turn evidence into action.",
-    icon: "🔬",
+    icon: Microscope,
   },
   {
     title: "Technologists",
     description: "Build tools for real-world problems.",
-    icon: "⚡",
+    icon: Zap,
   },
   {
     title: "Designers",
     description: "Make sustainable ideas usable.",
-    icon: "✦",
+    icon: Sparkles,
   },
   {
     title: "Organizations",
     description: "Find collaborators.",
-    icon: "◎",
+    icon: Building2,
   },
   {
     title: "Curious humans",
     description: "Start somewhere.",
-    icon: "◉",
+    icon: Compass,
   },
 ];
 
@@ -53,27 +61,30 @@ export function CommunitySection() {
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {COMMUNITY_CARDS.map((card, i) => (
-            <div
-              key={card.title}
-              className={`group border border-border/30 p-6 sm:p-8 hover:border-bamboo/30 hover:bg-bamboo/[0.02] transition-all duration-500 cursor-default ${
-                isVisible
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-8"
-              }`}
-              style={{ transitionDelay: `${0.2 + i * 0.1}s` }}
-            >
-              <span className="text-2xl mb-4 block opacity-60 group-hover:opacity-100 transition-opacity">
-                {card.icon}
-              </span>
-              <h3 className="font-display text-lg font-bold tracking-tight mb-2 group-hover:text-bamboo transition-colors duration-300">
-                {card.title}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {card.description}
-              </p>
-            </div>
-          ))}
+          {COMMUNITY_CARDS.map((card, i) => {
+            const Icon = card.icon;
+            return (
+              <div
+                key={card.title}
+                className={`group border border-border/30 p-6 sm:p-8 hover:border-bamboo/30 hover:bg-bamboo/[0.02] transition-all duration-500 cursor-default ${
+                  isVisible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-8"
+                }`}
+                style={{ transitionDelay: `${0.2 + i * 0.1}s` }}
+              >
+                <div className="w-10 h-10 rounded-lg bg-bamboo/10 text-bamboo flex items-center justify-center mb-5 group-hover:bg-bamboo/20 group-hover:scale-105 transition-all duration-300">
+                  <Icon className="w-5 h-5 stroke-[1.75]" />
+                </div>
+                <h3 className="font-display text-lg font-bold tracking-tight mb-2 group-hover:text-bamboo transition-colors duration-300">
+                  {card.title}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {card.description}
+                </p>
+              </div>
+            );
+          })}
         </div>
 
         <div

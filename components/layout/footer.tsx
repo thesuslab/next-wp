@@ -65,6 +65,11 @@ export function Footer() {
               <p className="text-xs text-muted-foreground/40">
                 hello@sustainabilitylab.xyz
               </p>
+              <p className="text-xs text-muted-foreground/40">
+                <a href="tel:9860897903" className="hover:text-bamboo transition-colors">
+                  +977 9860897903
+                </a>
+              </p>
             </div>
             <p className="font-display text-sm text-bamboo font-medium italic">
               Let&apos;s make the future less fragile.

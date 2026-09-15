@@ -38,7 +38,13 @@ export function LocationMap({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <a
+            href="tel:9860897903"
+            className="inline-flex items-center gap-1.5 text-xs font-mono text-foreground/80 hover:text-bamboo border border-border/80 hover:border-bamboo/40 px-3 py-2 rounded-lg bg-background/80 hover:bg-background transition-all duration-200"
+          >
+            <span>Tel: 9860897903</span>
+          </a>
           <a
             href={googleMapsDirectionsUrl}
             target="_blank"
@@ -77,6 +83,12 @@ export function LocationMap({
             Maharajgunj, Kathmandu Valley, Nepal. Living hydrological modeling,
             circular craft studio, and collaborative workspace.
           </p>
+          <div className="mt-2.5 pt-2 border-t border-border/40 flex items-center justify-between text-[11px]">
+            <span className="text-muted-foreground">Direct Desk:</span>
+            <a href="tel:9860897903" className="text-bamboo font-semibold hover:underline">
+              9860897903
+            </a>
+          </div>
         </div>
       </div>
     </div>

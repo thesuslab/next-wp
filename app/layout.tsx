@@ -11,6 +11,7 @@ import { LabLensHUD } from "@/components/lens/LabLensHUD";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 import { siteConfig } from "@/site.config";
 import { cn } from "@/lib/utils";
+import Script from "next/script";
 
 import type { Metadata } from "next";
 
@@ -123,6 +124,18 @@ export default function RootLayout({
       <head>
         <OrganizationJsonLd />
         <WebSiteJsonLd />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-H1PNLS2RMQ"
+          strategy="afterInteractive"
+        />
+        <Script id="google-tag-gtag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-H1PNLS2RMQ');
+          `}
+        </Script>
       </head>
       <body
         className={cn(

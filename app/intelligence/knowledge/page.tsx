@@ -7,6 +7,7 @@ import {
   KnowledgeEntry,
   getKnowledgeTopics,
 } from "@/lib/knowledge/data";
+import { InlineMarkdown } from "@/components/knowledge/MarkdownViewer";
 
 const categories = [
   "ALL",
@@ -264,7 +265,7 @@ export default function KnowledgePage() {
 
                 {/* Summary */}
                 <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-                  {art.summary}
+                  <InlineMarkdown content={art.summary} />
                 </p>
 
                 {/* Structured Data Metric Callout (if present) */}

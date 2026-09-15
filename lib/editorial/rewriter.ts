@@ -14,6 +14,7 @@ import { queryAIProvider } from "@/lib/ai/provider";
 function sanitizeMarkdown(text: string): string {
   if (!text) return "";
   return text
+    .replace(/<!--[\s\S]*?-->/g, "")
     .replace(/<br\s*\/?>/gi, "\n\n")
     .replace(/<\/?[^>]+(>|$)/g, "")
     .replace(/\b(groq|openai|chatgpt|grok|anthropic|llama)\b/gi, "Sustainability Lab Evidence Engine")
@@ -152,10 +153,13 @@ export function fallbackEvidenceSynthesis(item: RawEditorialItem): {
   topic: string;
   tags: string[];
 } {
+  const cleanedItemSummary = (item.summary || "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .trim();
   const summary =
-    item.summary.length > 250
-      ? `${item.summary.slice(0, 247).trim()}...`
-      : item.summary || `Verified institutional findings published by ${item.sourceName}.`;
+    cleanedItemSummary.length > 250
+      ? `${cleanedItemSummary.slice(0, 247).trim()}...`
+      : cleanedItemSummary || `Verified institutional findings published by ${item.sourceName}.`;
 
   const topic = inferCategory(item.title, item.content, item.defaultCategory);
 

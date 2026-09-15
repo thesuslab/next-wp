@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { LocationMap } from "@/components/maps/LocationMap";
+import { Phone, Mail, MapPin } from "lucide-react";
 
 type IntentType =
   | "project"
@@ -194,6 +195,66 @@ export default function CollaboratePage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Direct Contact Channels */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="p-6 rounded-2xl bg-card border border-border/80 flex items-start gap-4 shadow-sm hover:border-bamboo/40 transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-bamboo/10 text-bamboo flex items-center justify-center shrink-0">
+              <Phone className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">
+                Direct Line / WhatsApp
+              </div>
+              <a
+                href="tel:9860897903"
+                className="font-mono text-base sm:text-lg font-bold text-foreground hover:text-bamboo transition-colors"
+              >
+                9860897903
+              </a>
+              <p className="text-xs text-muted-foreground mt-1">
+                Directorate telephone &amp; rapid communication
+              </p>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-card border border-border/80 flex items-start gap-4 shadow-sm hover:border-data/40 transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-data/10 text-data flex items-center justify-center shrink-0">
+              <Mail className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">
+                Directorate Email
+              </div>
+              <a
+                href="mailto:hello@sustainabilitylab.xyz"
+                className="font-mono text-base sm:text-lg font-bold text-foreground hover:text-data transition-colors"
+              >
+                hello@sustainabilitylab.xyz
+              </a>
+              <p className="text-xs text-muted-foreground mt-1">
+                Project briefs, data exchanges &amp; RFPs
+              </p>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-card border border-border/80 flex items-start gap-4 shadow-sm hover:border-border transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-muted text-foreground flex items-center justify-center shrink-0">
+              <MapPin className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1">
+                Research Station
+              </div>
+              <div className="font-mono text-sm sm:text-base font-bold text-foreground">
+                Maharajgunj, Kathmandu
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Coordinates: 27.7408° N, 85.3365° E
+              </p>
+            </div>
           </div>
         </div>
 

@@ -27,9 +27,18 @@ export function ManifestoSection() {
   return (
     <section
       ref={ref}
-      className="py-32 md:py-48 bg-foreground text-background relative overflow-hidden"
+      className="py-32 md:py-48 bg-[#11130e] text-white relative overflow-hidden border-y border-white/10"
     >
-      <div className="max-w-[1400px] mx-auto px-6 sm:px-8">
+      {/* Subtle ambient bio-luminescent glow */}
+      <div
+        className="absolute inset-0 opacity-25 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 50%, hsl(var(--bamboo) / 0.25) 0%, transparent 70%)",
+        }}
+      />
+
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 sm:px-8">
         <div className="max-w-3xl mx-auto">
           {/* First block */}
           <div className="mb-16">
@@ -49,8 +58,8 @@ export function ManifestoSection() {
                     transitionDelay: `${i * 0.12}s`,
                     color:
                       i >= 3
-                        ? "rgba(255,255,255,0.5)"
-                        : "rgba(255,255,255,0.9)",
+                        ? "rgba(255,255,255,0.55)"
+                        : "rgba(255,255,255,0.95)",
                   }}
                 >
                   {line}
@@ -73,7 +82,7 @@ export function ManifestoSection() {
                   transitionDelay: `${1.3 + i * 0.15}s`,
                   color:
                     i === 0
-                      ? "rgba(255,255,255,0.5)"
+                      ? "rgba(255,255,255,0.55)"
                       : "hsl(var(--bamboo-light))",
                 }}
               >

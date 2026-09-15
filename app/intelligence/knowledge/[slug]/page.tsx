@@ -7,6 +7,7 @@ import {
   getRelatedKnowledgeEntries,
   type KnowledgeEntry,
 } from "@/lib/knowledge/data";
+import { MarkdownViewer } from "@/components/knowledge/MarkdownViewer";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -29,12 +30,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const cleanDescription = (entry.seoDescription || entry.summary || "")
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .trim();
+
   return {
     title: entry.seoTitle,
-    description: entry.seoDescription,
+    description: cleanDescription,
     openGraph: {
       title: entry.seoTitle,
-      description: entry.seoDescription,
+      description: cleanDescription,
       type: "article",
     },
   };
@@ -101,9 +106,10 @@ export default async function KnowledgeArticlePage({ params }: Props) {
               <span className="w-2 h-2 rounded-full bg-data" />
               Executive Summary
             </div>
-            <p className="text-base text-foreground/90 leading-relaxed font-light">
-              {entry.summary}
-            </p>
+            <MarkdownViewer
+              content={entry.summary}
+              className="prose-p:text-base sm:prose-p:text-base prose-p:my-1 text-foreground/90 font-light leading-relaxed"
+            />
           </div>
         </header>
 
@@ -219,13 +225,7 @@ export default async function KnowledgeArticlePage({ params }: Props) {
 
         {/* Article Full Body */}
         <article className="mb-14">
-          <div className="prose prose-lg dark:prose-invert max-w-none space-y-6 text-foreground/90 font-light leading-relaxed">
-            {entry.body.split("\n\n").map((paragraph, idx) => (
-              <p key={idx} className="text-base sm:text-lg leading-relaxed">
-                {paragraph}
-              </p>
-            ))}
-          </div>
+          <MarkdownViewer content={entry.body} />
         </article>
 
         {/* Tags */}
