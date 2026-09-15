@@ -1,5 +1,3 @@
-import { getStoredEditorialArticles } from "../editorial/store";
-
 export interface KnowledgeSource {
   name: string;
   url: string;
@@ -179,7 +177,7 @@ function createEntry(input: RawEntryInput): KnowledgeEntry {
     tags: input.tags,
     data: input.data || null,
     readTime,
-    seoTitle: `${input.title} | Sustainability Lab`,
+    seoTitle: `${input.title} | Sustainability Lab Nepal`,
     seoDescription: input.summary,
   };
 }
@@ -592,21 +590,7 @@ The most humane intervention is often the one that reduces exposure while expand
   }),
 ];
 
-/**
- * Query helper to retrieve all entries, dynamically merging baseline knowledge seed
- * with newly ingested and verified editorial articles on the server.
- */
 export function getAllKnowledgeEntries(): KnowledgeEntry[] {
-  try {
-    const stored = getStoredEditorialArticles();
-    if (Array.isArray(stored) && stored.length > 0) {
-      const seen = new Set(knowledgeEntries.map((e) => e.slug));
-      const unique = stored.filter((e: KnowledgeEntry) => !seen.has(e.slug));
-      return [...unique, ...knowledgeEntries];
-    }
-  } catch (err: any) {
-    console.warn("[Knowledge Base] Dynamic article load warning:", err?.message);
-  }
   return knowledgeEntries;
 }
 

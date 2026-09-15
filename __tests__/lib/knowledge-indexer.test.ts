@@ -22,12 +22,14 @@ describe("Sustainable AI Knowledge Indexer", () => {
       },
       excerpt: {
         rendered: "<p>Real-time seismic telemetry deployed around Imja Tsho glacial lake.</p>",
+        protected: false,
       },
       content: {
         rendered: `<div>
           <p>Researchers installed acoustic sensors to detect sudden sub-surface dam displacement.</p>
           <p>Early warning sirens are calibrated to transmit emergency alerts within 90 seconds of breach threshold.</p>
         </div>`,
+        protected: false,
       },
     };
 
