@@ -9,38 +9,99 @@ export interface ContactEmailPayload {
 }
 
 /**
+ * Helper to auto-detect SMTP server host if only username is provided.
+ */
+function inferSmtpHost(username: string): { host: string; port?: number; secure?: boolean } | null {
+  const cleanUser = username.trim().toLowerCase();
+  if (cleanUser.endsWith("@gmail.com") || cleanUser.endsWith("@googlemail.com")) {
+    return { host: "smtp.gmail.com", port: 465, secure: true };
+  }
+  if (
+    cleanUser.endsWith("@outlook.com") ||
+    cleanUser.endsWith("@hotmail.com") ||
+    cleanUser.endsWith("@live.com")
+  ) {
+    return { host: "smtp-mail.outlook.com", port: 587, secure: false };
+  }
+  if (cleanUser.endsWith("@yahoo.com")) {
+    return { host: "smtp.mail.yahoo.com", port: 465, secure: true };
+  }
+  if (cleanUser === "apikey") {
+    return { host: "smtp.sendgrid.net", port: 587, secure: false };
+  }
+  if (cleanUser === "resend") {
+    return { host: "smtp.resend.com", port: 465, secure: true };
+  }
+  return null;
+}
+
+/**
  * Configure Nodemailer transport using environment variables.
- * Supports SMTP_username / smtp_username, smtp_password / SMTP_password,
- * and smtp_server / SMTP_server / SMTP_HOST.
+ * Supports SMTP_SERVER, SMTP_HOST, MAIL_HOST,
+ * SMTP_USERNAME, SMTP_USER, MAIL_USERNAME,
+ * SMTP_PASSWORD, SMTP_PASS, MAIL_PASSWORD, etc.
+ * Auto-detects well-known SMTP providers (like Gmail) if host is omitted.
  */
 export function getMailTransporter() {
-  const host =
-    process.env.SMTP_SERVER ||
-    process.env.smtp_server ||
-    process.env.SMTP_HOST ||
-    process.env.smtp_host ||
-    "";
   const user =
     process.env.SMTP_USERNAME ||
     process.env.smtp_username ||
     process.env.SMTP_USER ||
     process.env.smtp_user ||
+    process.env.MAIL_USERNAME ||
+    process.env.EMAIL_USER ||
     "";
   const pass =
     process.env.SMTP_PASSWORD ||
     process.env.smtp_password ||
     process.env.SMTP_PASS ||
     process.env.smtp_pass ||
+    process.env.MAIL_PASSWORD ||
+    process.env.EMAIL_PASSWORD ||
     "";
-  const port = parseInt(
-    process.env.SMTP_PORT || process.env.smtp_port || "465",
-    10
-  );
-  const secure = port === 465;
+  let host =
+    process.env.SMTP_SERVER ||
+    process.env.smtp_server ||
+    process.env.SMTP_HOST ||
+    process.env.smtp_host ||
+    process.env.MAIL_HOST ||
+    process.env.EMAIL_HOST ||
+    "";
+
+  // Auto-detect host from username if host is not explicitly set
+  if (!host && user) {
+    const inferred = inferSmtpHost(user);
+    if (inferred) {
+      host = inferred.host;
+      console.info(`[SMTP] Auto-detected host '${host}' from username '${user}'.`);
+    } else {
+      console.warn(
+        `[SMTP] Warning: SMTP credentials provided but SMTP_SERVER (or SMTP_HOST) is missing. Set SMTP_SERVER in Railway variables.`
+      );
+    }
+  }
 
   if (!host || !user || !pass) {
     return null;
   }
+
+  const portEnv =
+    process.env.SMTP_PORT ||
+    process.env.smtp_port ||
+    process.env.MAIL_PORT ||
+    "";
+
+  const port = portEnv
+    ? parseInt(portEnv, 10)
+    : host === "smtp-mail.outlook.com" || host === "smtp.sendgrid.net"
+    ? 587
+    : 465;
+
+  const secureOverride = process.env.SMTP_SECURE || process.env.smtp_secure;
+  const secure =
+    secureOverride !== undefined
+      ? secureOverride === "true" || secureOverride === "1"
+      : port === 465;
 
   return nodemailer.createTransport({
     host,
@@ -50,6 +111,9 @@ export function getMailTransporter() {
       user,
       pass,
     },
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000,
   });
 }
 
@@ -58,11 +122,23 @@ export function getMailTransporter() {
  */
 export async function sendContactEmail(payload: ContactEmailPayload) {
   const transporter = getMailTransporter();
-  const directorateEmail =
-    process.env.DIRECTORATE_EMAIL ||
+  const user =
     process.env.SMTP_USERNAME ||
     process.env.smtp_username ||
-    "hello@sustainabilitylab.xyz";
+    process.env.SMTP_USER ||
+    process.env.smtp_user ||
+    "";
+
+  const directorateEmail =
+    process.env.DIRECTORATE_EMAIL ||
+    process.env.SMTP_TO ||
+    process.env.CONTACT_EMAIL ||
+    (user && user.includes("@") ? user : "hello@sustainabilitylab.xyz");
+
+  const fromEmail =
+    process.env.SMTP_FROM ||
+    process.env.MAIL_FROM ||
+    (user && user.includes("@") ? user : directorateEmail);
 
   const emailBodyText = `
 New Project Intake / Inquiry Received via Sustainability Lab Portal
@@ -135,19 +211,29 @@ Headquarters: Maharajgunj Research Station, Kathmandu Valley (27.7408° N, 85.33
   }
 
   // 1. Send notification to Directorate
-  await transporter.sendMail({
-    from: `"Sustainability Lab Intake" <${directorateEmail}>`,
-    to: directorateEmail,
-    replyTo: payload.email,
-    subject: `[Intake: ${payload.intent.toUpperCase()}] Project Brief from ${payload.name}`,
-    text: emailBodyText,
-    html: emailHtml,
-  });
+  try {
+    await transporter.sendMail({
+      from: `"Sustainability Lab Intake" <${fromEmail}>`,
+      to: directorateEmail,
+      replyTo: payload.email,
+      subject: `[Intake: ${payload.intent.toUpperCase()}] Project Brief from ${payload.name}`,
+      text: emailBodyText,
+      html: emailHtml,
+    });
+  } catch (sendError: any) {
+    console.error("[SMTP] Failed to send intake notification email:", {
+      message: sendError?.message,
+      code: sendError?.code,
+      response: sendError?.response,
+      command: sendError?.command,
+    });
+    throw sendError;
+  }
 
   // 2. Send acknowledgment to the sender
   try {
     await transporter.sendMail({
-      from: `"The Sustainability Lab Directorate" <${directorateEmail}>`,
+      from: `"The Sustainability Lab Directorate" <${fromEmail}>`,
       to: payload.email,
       subject: `Inquiry Received: Sustainability Lab Directorate Intake`,
       text: `Hello ${payload.name},\n\nThank you for reaching out to The Sustainability Lab. We have received your project brief under "${payload.intent}".\n\nOur Directorate and research team at the Maharajgunj Research Station review incoming proposals and inquiries and will follow up within 2 business days.\n\nWarm regards,\nDirectorate Secretariat\nThe Sustainability Lab\nMaharajgunj, Kathmandu Valley, Nepal\nhttps://sustainabilitylab.xyz`,
