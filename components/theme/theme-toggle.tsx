@@ -6,11 +6,12 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
 
   const handleClick = () => {
-    if (theme === "light") setTheme("dark");
-    else setTheme("light");
+    const current = resolvedTheme || theme || "light";
+    if (current === "dark") setTheme("light");
+    else setTheme("dark");
   };
 
   return (
