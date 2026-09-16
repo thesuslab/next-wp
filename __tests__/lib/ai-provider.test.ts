@@ -3,6 +3,7 @@ import {
   queryAIProvider,
   buildSystemPrompt,
   getActiveAIConfig,
+  stripMarkdown,
 } from "@/lib/ai/provider";
 
 describe("AI Intelligence Provider & Grounding", () => {
@@ -84,6 +85,49 @@ describe("AI Intelligence Provider & Grounding", () => {
     expect(response.text).toBeTruthy();
     expect(response.text).not.toContain("Out of Scope");
     expect(response.text).toContain("Himalayan Watershed");
+  });
+
+  it("ensures output from the AI is never marked down content (no headers, bold, italics, or markdown links)", async () => {
+    const queries = [
+      "what can you do for me",
+      "tell me about KĀRVA shop and materials",
+      "what are the historical climate baseline figures for Nepal",
+      "what are the flood and GLOF mitigation engineering options",
+      "Who won the FIFA World Cup?", // Out of scope
+    ];
+
+    for (const query of queries) {
+      const response = await queryAIProvider([{ role: "user", content: query }]);
+      expect(response.text).toBeTruthy();
+      // No markdown headers
+      expect(response.text).not.toMatch(/^#{1,6}\s/m);
+      // No markdown bold asterisks
+      expect(response.text).not.toMatch(/\*\*[^*]+\*\*/);
+      // No markdown link syntax [text](url)
+      expect(response.text).not.toMatch(/\[[^\]]+\]\([^)]+\)/);
+      // No markdown backticks
+      expect(response.text).not.toMatch(/`[^`]+`/);
+    }
+  });
+
+  it("strips arbitrary markdown formatting via stripMarkdown utility", () => {
+    const raw = `### 1. Key Finding
+**Critical Data**: The river temperature rose by *+1.5°C*.
+- [Official Report](https://example.com/report)
+\`\`\`ts
+const x = 1;
+\`\`\`
+Check \`code\` here.`;
+
+    const cleaned = stripMarkdown(raw);
+    expect(cleaned).not.toContain("###");
+    expect(cleaned).not.toContain("**");
+    expect(cleaned).not.toContain("[Official Report]");
+    expect(cleaned).not.toContain("```");
+    expect(cleaned).not.toContain("`");
+    expect(cleaned).toContain("1. Key Finding");
+    expect(cleaned).toContain("Critical Data");
+    expect(cleaned).toContain("https://example.com/report");
   });
 });
 

@@ -590,8 +590,71 @@ The most humane intervention is often the one that reduces exposure while expand
   }),
 ];
 
+// Dynamic in-memory registry for newly indexed articles
+const inMemoryKnowledgeEntries: KnowledgeEntry[] = [];
+
+/**
+ * Register a newly created or indexed article into the active runtime knowledge base.
+ */
+export function registerKnowledgeEntry(entry: KnowledgeEntry): void {
+  const idx = inMemoryKnowledgeEntries.findIndex(
+    (e) => e.slug === entry.slug || e.id === entry.id
+  );
+  if (idx >= 0) {
+    inMemoryKnowledgeEntries[idx] = entry;
+  } else {
+    inMemoryKnowledgeEntries.unshift(entry);
+  }
+}
+
+/**
+ * Safely load stored editorial articles from disk in Node.js runtime
+ * without static bundler tracing on client side.
+ */
+function getStoredEditorialArticlesSafe(): KnowledgeEntry[] {
+  if (typeof window !== "undefined") {
+    return [];
+  }
+  try {
+    // eval("require") prevents Turbopack/Webpack from attempting to bundle 'fs' in client chunks
+    const nodeReq = typeof eval === "function" ? eval("require") : null;
+    if (!nodeReq) return [];
+    const fs = nodeReq("fs");
+    const path = nodeReq("path");
+    const filePath = path.join(process.cwd(), "data", "editorial_articles.json");
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      if (content && content.trim()) {
+        const parsed = JSON.parse(content);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    }
+  } catch {
+    return [];
+  }
+  return [];
+}
+
+/**
+ * Returns all knowledge entries, automatically merging baseline reports,
+ * stored editorial articles, and newly indexed dispatches.
+ */
 export function getAllKnowledgeEntries(): KnowledgeEntry[] {
-  return knowledgeEntries;
+  const diskArticles = getStoredEditorialArticlesSafe();
+  const allDynamic = [...inMemoryKnowledgeEntries, ...diskArticles];
+
+  const seenSlugs = new Set<string>();
+  const uniqueDynamic: KnowledgeEntry[] = [];
+
+  for (const item of allDynamic) {
+    if (item && item.slug && !seenSlugs.has(item.slug)) {
+      seenSlugs.add(item.slug);
+      uniqueDynamic.push(item);
+    }
+  }
+
+  const baselineUnique = knowledgeEntries.filter((e) => !seenSlugs.has(e.slug));
+  return [...uniqueDynamic, ...baselineUnique];
 }
 
 /**

@@ -1,8 +1,10 @@
 "use client";
 
 import { useRef, useEffect, useCallback } from "react";
-import { useMousePosition } from "@/lib/hooks/useMousePosition";
+import Image from "next/image";
 import Link from "next/link";
+import { Sprout } from "lucide-react";
+import { useMousePosition } from "@/lib/hooks/useMousePosition";
 
 interface DataPoint {
   x: number;
@@ -72,10 +74,10 @@ export function HeroSection() {
 
       // Draw topographic lines
       const isDark = document.documentElement.classList.contains("dark");
-      const lineColor = isDark ? "rgba(124,159,46,0.07)" : "rgba(93,121,36,0.06)";
-      const pointColor = isDark ? "rgba(124,159,46,0.75)" : "rgba(93,121,36,0.7)";
-      const connectionColor = isDark ? "rgba(0,212,170,0.18)" : "rgba(6,114,110,0.14)";
-      const labelColor = isDark ? "rgba(164,186,101,0.9)" : "rgba(46,66,17,0.8)";
+      const lineColor = isDark ? "rgba(124,159,46,0.08)" : "rgba(93,121,36,0.12)";
+      const pointColor = isDark ? "rgba(164,186,101,0.8)" : "rgba(75,102,24,0.75)";
+      const connectionColor = isDark ? "rgba(0,212,170,0.16)" : "rgba(6,114,110,0.16)";
+      const labelColor = isDark ? "rgba(164,186,101,0.9)" : "rgba(46,66,17,0.85)";
 
       // Topographic contour lines
       for (let i = 0; i < 12; i++) {
@@ -162,23 +164,49 @@ export function HeroSection() {
       ref={containerRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden -mt-[64px] pt-[64px]"
     >
+      {/* Background Image: Sprouting Moss and Sapling Emerging from Fertile Ground */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
+        <Image
+          src="/images/hero-moss-sprout.jpg"
+          alt="Lush green moss and saplings sprouting from fertile ground with morning dewdrops"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[center_70%] sm:object-[center_60%] scale-[1.02] brightness-[1.03] contrast-[1.02]"
+        />
+
+        {/* Ambient Light Theme Overlay Gradients for Readability and Depth */}
+        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/75 to-background/30 dark:hidden" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/25 to-background/50 dark:hidden" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-background/80 via-transparent to-transparent dark:hidden" />
+
+        {/* Ambient Dark Theme Overlay Gradients */}
+        <div className="absolute inset-0 hidden dark:block bg-gradient-to-r from-background/95 via-background/85 to-background/50" />
+        <div className="absolute inset-0 hidden dark:block bg-gradient-to-t from-background via-background/35 to-background/75" />
+        <div className="absolute inset-0 hidden dark:block bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-background/90 via-transparent to-transparent" />
+      </div>
+
+      {/* Interactive Topographic & Telemetry Canvas Overlay */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-0 z-1 pointer-events-none"
       />
 
+      {/* Main Content */}
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 sm:px-8 w-full">
         <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 text-xs font-mono tracking-widest uppercase bg-bamboo/10 text-bamboo border border-bamboo/30 rounded-full mb-6">
-            01 • THE LIVING PLATFORM
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono tracking-widest uppercase bg-bamboo/15 text-bamboo-dark dark:text-bamboo-light border border-bamboo/30 rounded-full mb-6 backdrop-blur-md shadow-xs">
+            <Sprout className="w-3.5 h-3.5 text-bamboo animate-pulse" />
+            <span>01 • THE LIVING PLATFORM</span>
           </div>
+
           <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95] mb-6">
             INTELLIGENCE FOR
             <br />
-            <span className="text-muted-foreground/60">A living planet.</span>
+            <span className="text-bamboo-dark/85 dark:text-bamboo-light/95">A living planet.</span>
           </h1>
 
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed">
+          <p className="text-lg sm:text-xl text-foreground/80 dark:text-muted-foreground max-w-xl mb-10 leading-relaxed font-normal">
             Environmental intelligence, technology, enterprise and people working
             together to build systems that can last.
           </p>
@@ -186,13 +214,13 @@ export function HeroSection() {
           <div className="flex flex-wrap gap-4">
             <Link
               href="/lab"
-              className="inline-flex px-7 py-3.5 text-xs font-display font-medium tracking-[0.15em] uppercase bg-foreground text-background hover:bg-bamboo hover:text-white transition-all duration-300"
+              className="inline-flex px-7 py-3.5 text-xs font-display font-medium tracking-[0.15em] uppercase bg-foreground text-background hover:bg-bamboo hover:text-white transition-all duration-300 shadow-md hover:shadow-lg"
             >
               Explore the Lab
             </Link>
             <Link
               href="/collaborate/contact"
-              className="inline-flex px-7 py-3.5 text-xs font-display font-medium tracking-[0.15em] uppercase border border-foreground/20 text-foreground hover:border-bamboo hover:text-bamboo transition-all duration-300"
+              className="inline-flex px-7 py-3.5 text-xs font-display font-medium tracking-[0.15em] uppercase border border-foreground/30 bg-background/50 backdrop-blur-sm text-foreground hover:border-bamboo hover:text-bamboo hover:bg-background/80 transition-all duration-300"
             >
               Work with us
             </Link>
@@ -201,11 +229,11 @@ export function HeroSection() {
       </div>
 
       {/* Bottom scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-float">
-        <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 animate-float pointer-events-none">
+        <span className="text-[10px] font-mono text-foreground/50 dark:text-muted-foreground/40 tracking-[0.2em] uppercase">
           Scroll
         </span>
-        <div className="w-[1px] h-8 bg-gradient-to-b from-muted-foreground/30 to-transparent" />
+        <div className="w-[1px] h-8 bg-gradient-to-b from-foreground/30 dark:from-muted-foreground/30 to-transparent" />
       </div>
     </section>
   );

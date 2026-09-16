@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
+  getAllKnowledgeEntries,
   knowledgeEntries,
   KnowledgeEntry,
   getKnowledgeTopics,
@@ -22,7 +23,7 @@ const categories = [
 const kinds = ["ALL", "knowledge", "research", "documentation"] as const;
 
 export default function KnowledgePage() {
-  const [articles, setArticles] = useState<KnowledgeEntry[]>(knowledgeEntries);
+  const [articles, setArticles] = useState<KnowledgeEntry[]>(getAllKnowledgeEntries());
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [selectedTopic, setSelectedTopic] = useState<string>("ALL");
   const [selectedKind, setSelectedKind] = useState<string>("ALL");

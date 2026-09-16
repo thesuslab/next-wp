@@ -258,10 +258,11 @@ ${knowledgeContext || "Access to all Sustainability Lab verified knowledge repor
   You must politely decline to answer, state that as the Sustainability Lab's Sustainable AI Advisor you strictly focus on environmental science and climate resilience, and invite them to ask about our research, reports, or watershed data.
 
 ## Output Formatting & Polish Rules (MANDATORY):
-1. **No Broken Tables**: Do NOT output markdown tables that have bullet points, newlines, or multiple paragraphs inside table cells. Use clean, hierarchical sections with bold headings and bulleted lists.
-2. **Never Cut Off**: Ensure every sentence, paragraph, and bullet point is fully completed. Never leave a thought truncated mid-sentence.
-3. **Rigorous & Practical**: Maintain an authoritative, interdisciplinary tone grounded in physical engineering, empirical climate data, and local ecological reality.
-4. **Clean Markdown**: Use standard markdown line breaks and lists. Do NOT output raw HTML tags.${contextStr}`;
+1. **Never Output Markdown**: The output from the AI is never marked down content. Do NOT use markdown headers (#, ##, ###), no bold or italic asterisks (**, *), no markdown bullet asterisks, no markdown link syntax [text](url), no markdown tables, and no code backticks.
+2. **No Broken Tables**: Do NOT output markdown tables that have bullet points, newlines, or multiple paragraphs inside table cells. Use clean, plain text with simple unicode bullet points (•) and clear line breaks.
+3. **Never Cut Off**: Ensure every sentence, paragraph, and bullet point is fully completed. Never leave a thought truncated mid-sentence.
+4. **Rigorous & Practical**: Maintain an authoritative, interdisciplinary tone grounded in physical engineering, empirical climate data, and local ecological reality.
+5. **Clean Plain Text**: Provide readable, formatted plain text with natural paragraphs and unicode bullets (•). Do NOT output raw HTML tags or markdown tags.${contextStr}`;
 }
 
 /**
@@ -380,17 +381,75 @@ export function isRelevantDomainQuery(query: string, context?: any): boolean {
   return false;
 }
 
+/**
+ * Strips all markdown syntax and formatting from text, guaranteeing that
+ * AI output is never marked down content.
+ */
+export function stripMarkdown(text: string): string {
+  if (!text) return "";
+
+  let cleaned = text;
+
+  // 1. Remove HTML comments and raw tags
+  cleaned = cleaned.replace(/<!--[\s\S]*?-->/g, "");
+  cleaned = cleaned.replace(/<br\s*\/?>/gi, "\n");
+  cleaned = cleaned.replace(/&nbsp;/gi, " ");
+  cleaned = cleaned.replace(/<\/?[a-z0-9]+[^>]*>/gi, "");
+
+  // 2. Remove code block backticks but keep code content
+  cleaned = cleaned.replace(/```[a-zA-Z0-9_-]*\n?([\s\S]*?)```/g, "$1");
+  cleaned = cleaned.replace(/`([^`\n]+)`/g, "$1");
+
+  // 3. Remove Markdown headers (#, ##, ###, ####, #####, ######)
+  cleaned = cleaned.replace(/^#{1,6}\s+(.+)$/gm, "$1");
+
+  // 4. Remove bold & italic markup (***text***, **text**, *text*, ___text___, __text__, _text_)
+  cleaned = cleaned.replace(/\*\*\*([^*]+)\*\*\*/g, "$1");
+  cleaned = cleaned.replace(/\*\*([^*]+)\*\*/g, "$1");
+  cleaned = cleaned.replace(/\*([^*\n]+)\*/g, "$1");
+  cleaned = cleaned.replace(/___([^_]+)___/g, "$1");
+  cleaned = cleaned.replace(/__([^_]+)__/g, "$1");
+  cleaned = cleaned.replace(/_([^_\n]+)_/g, "$1");
+
+  // 5. Convert markdown links [Label](url) -> "Label: url" or plain url
+  cleaned = cleaned.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, label, url) => {
+    if (label.trim() === url.trim() || !label.trim()) {
+      return url;
+    }
+    return `${label}: ${url}`;
+  });
+
+  // 6. Convert markdown images ![alt](url) -> ""
+  cleaned = cleaned.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, "");
+
+  // 7. Remove blockquote markers
+  cleaned = cleaned.replace(/^>\s*/gm, "");
+
+  // 8. Remove horizontal rules
+  cleaned = cleaned.replace(/^[-*_]{3,}\s*$/gm, "");
+
+  // 9. Standardize list bullets: convert asterisk/plus/hyphen bullets to clean unicode bullets (• )
+  cleaned = cleaned.replace(/^(\s*)[*+]\s+/gm, "$1• ");
+  cleaned = cleaned.replace(/^(\s*)-\s+/gm, "$1• ");
+
+  // 10. Clean up excessive empty lines
+  cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
+
+  return cleaned.trim();
+}
+
 export function getOutOfScopeResponse(): string {
-  return `### Out of Scope • Sustainable AI Advisor
-I am the Sustainability Lab's **Sustainable AI Advisor**, specialized exclusively in environmental intelligence, Himalayan climate resilience, watershed engineering, and circular craftsmanship.
+  return stripMarkdown(`Out of Scope • Sustainable AI Advisor
+
+I am the Sustainability Lab's Sustainable AI Advisor, specialized exclusively in environmental intelligence, Himalayan climate resilience, watershed engineering, and circular craftsmanship.
 
 I can only assist with inquiries related to:
-- **Climate Science & Telemetry**: Nepal historical baselines, SSP3-7.0 projections, and cryosphere telemetry.
-- **Watershed & Engineering**: GLOF multi-hazard early warning, Run-of-River hydro safeguarding, and bio-engineering cut-slope stabilization.
-- **Circular Design & Craft**: Salvaged Shorea robusta (Sal) architectural timber and KĀRVA Studio artifacts.
-- **Published Dispatches**: Verified institutional reports and field dispatches published across the knowledge base.
+• Climate Science & Telemetry: Nepal historical baselines, SSP3-7.0 projections, and cryosphere telemetry.
+• Watershed & Engineering: GLOF multi-hazard early warning, Run-of-River hydro safeguarding, and bio-engineering cut-slope stabilization.
+• Circular Design & Craft: Salvaged Shorea robusta (Sal) architectural timber and KĀRVA Studio artifacts.
+• Published Dispatches: Verified institutional reports and field dispatches published across the knowledge base.
 
-*Please pose an inquiry related to environmental science, climate adaptation, or Sustainability Lab research.*`;
+Please pose an inquiry related to environmental science, climate adaptation, or Sustainability Lab research.`);
 }
 
 /**
@@ -414,7 +473,7 @@ export async function queryAIProvider(
       provider: config.provider,
       model: config.model,
       status: "Domain relevance enforced: off-topic query declined.",
-      text: getOutOfScopeResponse(),
+      text: stripMarkdown(getOutOfScopeResponse()),
     };
   }
 
@@ -424,7 +483,7 @@ export async function queryAIProvider(
       provider: config.provider,
       model: config.model,
       status: config.statusMessage,
-      text: generateSimulatedResponse(userQuery, context),
+      text: stripMarkdown(generateSimulatedResponse(userQuery, context)),
     };
   }
 
@@ -477,30 +536,26 @@ export async function queryAIProvider(
         provider: config.provider,
         model: config.model,
         status: `Provider error ${res.status}: falling back to Lab simulation`,
-        text: generateSimulatedResponse(
-          messages[messages.length - 1]?.content || "",
-          context
+        text: stripMarkdown(
+          generateSimulatedResponse(
+            messages[messages.length - 1]?.content || "",
+            context
+          )
         ),
       };
     }
 
     const data = await res.json();
-    let replyText =
+    const replyText =
       data.choices?.[0]?.message?.content ||
       data.candidates?.[0]?.content?.parts?.[0]?.text ||
       "No response generated.";
-
-    // Clean any unwanted raw HTML tags like <br>, <br/>, <br />, &nbsp; from response
-    replyText = replyText
-      .replace(/<br\s*\/?>/gi, "\n")
-      .replace(/&nbsp;/gi, " ")
-      .replace(/<\/?[a-z0-9]+[^>]*>/gi, "");
 
     return {
       provider: config.provider,
       model: config.model,
       status: "OK",
-      text: replyText.trim(),
+      text: stripMarkdown(replyText),
     };
   } catch (err: any) {
     console.error(`[AI Provider ${config.provider}] Fetch Exception:`, err);
@@ -508,17 +563,16 @@ export async function queryAIProvider(
       provider: config.provider,
       model: config.model,
       status: `Connection failed: ${err.message}. Showing simulated synthesis.`,
-      text: generateSimulatedResponse(
-        messages[messages.length - 1]?.content || "",
-        context
+      text: stripMarkdown(
+        generateSimulatedResponse(
+          messages[messages.length - 1]?.content || "",
+          context
+        )
       ),
     };
   }
 }
 
-/**
- * High-fidelity fallback synthesis when keys are absent or offline.
- */
 /**
  * High-fidelity fallback synthesis when keys are absent or offline.
  */
@@ -530,22 +584,23 @@ function generateSimulatedResponse(query: string, context?: any): string {
   if (articleSlug) {
     const article = getKnowledgeEntryBySlug(articleSlug);
     if (article) {
-      return `### Synthesis: ${article.title}
-**Verified Knowledge Base Report • Provenance: ${article.source.name} (${article.source.date})**
-*Evidence Level: ${article.source.level.toUpperCase()} • Region: ${article.region}${article.locality ? ` (${article.locality})` : ""}*
+      return stripMarkdown(`Synthesis: ${article.title}
+Verified Knowledge Base Report • Provenance: ${article.source.name} (${article.source.date})
+Evidence Level: ${article.source.level.toUpperCase()} • Region: ${article.region}${article.locality ? ` (${article.locality})` : ""}
 
-1. **Core Finding**: ${article.summary}
-2. **Context & Analysis**:
+1. Core Finding: ${article.summary}
+
+2. Context & Analysis:
 ${article.body}
 ${
   article.data
-    ? `3. **Quantitative Telemetry Metrics**:\n${Object.entries(article.data)
-        .map(([k, v]) => `   - **${k}**: ${v}`)
+    ? `\n3. Quantitative Telemetry Metrics:\n${Object.entries(article.data)
+        .map(([k, v]) => `   • ${k}: ${v}`)
         .join("\n")}`
     : ""
 }
 
-*Direct citation verified from official document at [${article.source.url}](${article.source.url}).*`;
+Direct citation verified from official document at ${article.source.url}.`);
     }
   }
 
@@ -566,132 +621,134 @@ ${
     q.includes("location") ||
     q.includes("where")
   ) {
-    return `### How The Sustainability Lab Can Support You
+    return stripMarkdown(`How The Sustainability Lab Can Support You
 
 The Sustainability Lab (Maharajgunj Research Station, Kathmandu Valley: 27.7408° N, 85.3365° E) operates as an interdisciplinary research laboratory, environmental intelligence platform, and circular craftsmanship studio. We bridge scientific research, physical climate engineering, and tangible regenerative products.
 
 Here is how we can support your work across our operational pillars:
 
-#### 1. Intelligence & Open Knowledge Hub
-- **28+ Verified Evidence Reports**: Access our open repository of peer-reviewed syntheses grounded in official multilateral documents (UNFCCC Second NDC, World Bank CCKP, ICIMOD Hindu Kush Himalaya Assessment, WHO, and ADB).
-- **High-Resolution Spatial GIS Telemetry**: Explore interactive spatial layers for Himalayan river catchments, glacier retreat zones, and climate vulnerability hotspots.
-- **Climate Risk Scanner**: Run forward-looking IPCC scenario modeling (SSP3-7.0 / SSP1-2.6) for 2030 and 2050 horizons to evaluate temperature anomalies and extreme precipitation risks for your projects.
-- *Explore*: \`/intelligence\` and \`/intelligence/knowledge\`.
+1. Intelligence & Open Knowledge Hub
+• 28+ Verified Evidence Reports: Access our open repository of peer-reviewed syntheses grounded in official multilateral documents (UNFCCC Second NDC, World Bank CCKP, ICIMOD Hindu Kush Himalaya Assessment, WHO, and ADB).
+• High-Resolution Spatial GIS Telemetry: Explore interactive spatial layers for Himalayan river catchments, glacier retreat zones, and climate vulnerability hotspots.
+• Climate Risk Scanner: Run forward-looking IPCC scenario modeling (SSP3-7.0 / SSP1-2.6) for 2030 and 2050 horizons to evaluate temperature anomalies and extreme precipitation risks for your projects.
+• Explore: /intelligence and /intelligence/knowledge
 
-#### 2. Watershed Resilience & Climate Engineering
-- **Hydrological Risk Auditing**: Run-of-River hydropower vulnerability assessments, cloudburst peak return calculation, and desanding basin adaptations.
-- **Nature-Based Bio-Engineering**: Slope stabilization blueprints utilizing deep-rooted native species (*Alnus nepalensis*, vetiver grass) for mountain roads and fragile hillsides.
-- **Early-Warning & IoT Sensing**: Low-cost telemetry mesh deployment for ungauged mountain catchments.
-- *Explore*: \`/resilience\`.
+2. Watershed Resilience & Climate Engineering
+• Hydrological Risk Auditing: Run-of-River hydropower vulnerability assessments, cloudburst peak return calculation, and desanding basin adaptations.
+• Nature-Based Bio-Engineering: Slope stabilization blueprints utilizing deep-rooted native species (Alnus nepalensis, vetiver grass) for mountain roads and fragile hillsides.
+• Early-Warning & IoT Sensing: Low-cost telemetry mesh deployment for ungauged mountain catchments.
+• Explore: /resilience
 
-#### 3. Enterprise Incubation & Circular Diagnostics
-- **Diagnostic Tool**: Rapidly benchmark your venture across circularity metrics, material footprint, and climate risk.
-- **Working Capital & Supply Chain Advisory**: Structuring regenerative business models and sustainable agricultural waste aggregation.
-- *Explore*: \`/enterprise\`.
+3. Enterprise Incubation & Circular Diagnostics
+• Diagnostic Tool: Rapidly benchmark your venture across circularity metrics, material footprint, and climate risk.
+• Working Capital & Supply Chain Advisory: Structuring regenerative business models and sustainable agricultural waste aggregation.
+• Explore: /enterprise
 
-#### 4. KĀRVA — The Sustainability Lab Shop
-- **Circular Craftsmanship & Upcycling**: KĀRVA is the official commercial shop and craft design studio of The Sustainability Lab.
-- **Reclaimed Himalayan Timber**: We recover century-old salvaged *Shorea robusta* (Sal) architectural beams from heritage demolition sites, handcrafting museum-grade furniture and architectural artifacts with non-toxic, zero-VOC beeswax and natural oil finishes.
-- **Bio-Composite Products**: Agricultural waste transformations (paddy straw, bagasse, mycelium packaging alternatives).
-- *Visit Official Shop*: [KĀRVA – The Sustainability Lab Shop](https://shop.sustainabilitylab.xyz/) or browse our archive at \`/karva\`.
+4. KĀRVA — The Sustainability Lab Shop
+• Circular Craftsmanship & Upcycling: KĀRVA is the official commercial shop and craft design studio of The Sustainability Lab.
+• Reclaimed Himalayan Timber: We recover century-old salvaged Shorea robusta (Sal) architectural beams from heritage demolition sites, handcrafting museum-grade furniture and architectural artifacts with non-toxic, zero-VOC beeswax and natural oil finishes.
+• Bio-Composite Products: Agricultural waste transformations (paddy straw, bagasse, mycelium packaging alternatives).
+• Visit Official Shop: KĀRVA – The Sustainability Lab Shop: https://shop.sustainabilitylab.xyz/ or browse our archive at /karva.
 
-#### 5. Physical Research Station & Coworking
-- **Maharajgunj Research Station**: A physical workspace, testing lab, and convening space in Kathmandu (Coordinates: 27.7408° N, 85.3365° E) for climate researchers, technologists, and circular entrepreneurs.
-- *Connect*: Visit \`/collaborate\` or reach out directly to **hello@sustainabilitylab.xyz**.`;
+5. Physical Research Station & Coworking
+• Maharajgunj Research Station: A physical workspace, testing lab, and convening space in Kathmandu (Coordinates: 27.7408° N, 85.3365° E) for climate researchers, technologists, and circular entrepreneurs.
+• Connect: Visit /collaborate or reach out directly to hello@sustainabilitylab.xyz.`);
   }
 
   // 3. Knowledge Base / NDC / Policy topics
   if (q.includes("ndc") || q.includes("net zero") || q.includes("policy") || q.includes("vulnerab")) {
-    const ndcArticle = getKnowledgeEntryBySlug("nepal-climate-policy-vulnerability-agency");
-    return `### Nepal Climate Policy & Vulnerability Framework
-**Primary Source: Government of Nepal — Second Nationally Determined Contribution (NDC)**
-*Verified Primary Policy Document*
+    return stripMarkdown(`Nepal Climate Policy & Vulnerability Framework
+Primary Source: Government of Nepal — Second Nationally Determined Contribution (NDC)
+Verified Primary Policy Document
 
-1. **Topography & Agency**: Nepal's Second NDC connects climate action to fragile mountain topography, climate-sensitive livelihoods, and limited adaptive capacity while asserting political agency for global mitigation.
-2. **Net Zero by 2050**: Frames net-zero emissions by 2050 as a binding long-horizon constraint shaping energy, transport, and public finance choices today.
-3. **Sectoral Targets (2030)**:
-   - Expansion of clean energy generation (hydropower and solar).
-   - Electric mobility targets across public transit and rail networks.
-   - 200,000 household biogas plants and improved clean-cooking stoves.
-   - Forest cover maintenance with equitable community benefit sharing.
+1. Topography & Agency: Nepal's Second NDC connects climate action to fragile mountain topography, climate-sensitive livelihoods, and limited adaptive capacity while asserting political agency for global mitigation.
+2. Net Zero by 2050: Frames net-zero emissions by 2050 as a binding long-horizon constraint shaping energy, transport, and public finance choices today.
+3. Sectoral Targets (2030):
+   • Expansion of clean energy generation (hydropower and solar).
+   • Electric mobility targets across public transit and rail networks.
+   • 200,000 household biogas plants and improved clean-cooking stoves.
+   • Forest cover maintenance with equitable community benefit sharing.
 
-*For full report analysis, see the Knowledge Base article at \`/intelligence/knowledge/nepal-climate-policy-vulnerability-agency\`.*`;
+For full report analysis, see the Knowledge Base article at /intelligence/knowledge/nepal-climate-policy-vulnerability-agency.`);
   }
 
   // 4. Packaging / Materials / KĀRVA
   if (q.includes("packag") || q.includes("waste") || q.includes("material") || q.includes("karva") || q.includes("timber") || q.includes("shop")) {
-    return `### KĀRVA — The Sustainability Lab Shop & Material Studio
-**Official Online Shop**: [KĀRVA – The Sustainability Lab Shop](https://shop.sustainabilitylab.xyz/)
-**Physical Location**: Maharajgunj Research Station Material Workshop, Kathmandu
+    return stripMarkdown(`KĀRVA — The Sustainability Lab Shop & Material Studio
+Official Online Shop: KĀRVA – The Sustainability Lab Shop: https://shop.sustainabilitylab.xyz/
+Physical Location: Maharajgunj Research Station Material Workshop, Kathmandu
 
 KĀRVA is the official circular craftsmanship and lifestyle shop of The Sustainability Lab. We recover discarded materials from Himalayan ecosystems and heritage urban demolition sites, transforming them into high-performance, timeless architectural furniture and lifestyle goods.
 
-#### Core KĀRVA Collections & Offerings:
-1. **Salvaged Century-Old Sal Timber (Shorea Robusta)**:
-   - Recovered from 80–100 year-old traditional buildings scheduled for demolition across Kathmandu Valley.
-   - Laboratory compressive testing confirms century-old heartwood exhibits 18% higher structural shear strength than virgin kiln-dried lumber due to slow silica mineralization.
-   - Finished exclusively with organic tung oil and natural Himalayan beeswax (100% zero-VOC and non-toxic).
-2. **Upcycled Agricultural Residues & Bio-Composites**:
-   - Thermoformed agricultural fibers (bagasse, paddy straw) and mycelium bio-bound materials offering a 74% embodied carbon reduction over polystyrene (thermocol).
-3. **Heritage Architectural Relics & Functional Craft**:
-   - Limited-run specimen furniture, artisanal desk goods, and custom architectural commissions for regenerative spaces.
+Core KĀRVA Collections & Offerings:
+1. Salvaged Century-Old Sal Timber (Shorea Robusta):
+   • Recovered from 80–100 year-old traditional buildings scheduled for demolition across Kathmandu Valley.
+   • Laboratory compressive testing confirms century-old heartwood exhibits 18% higher structural shear strength than virgin kiln-dried lumber due to slow silica mineralization.
+   • Finished exclusively with organic tung oil and natural Himalayan beeswax (100% zero-VOC and non-toxic).
+2. Upcycled Agricultural Residues & Bio-Composites:
+   • Thermoformed agricultural fibers (bagasse, paddy straw) and mycelium bio-bound materials offering a 74% embodied carbon reduction over polystyrene (thermocol).
+3. Heritage Architectural Relics & Functional Craft:
+   • Limited-run specimen furniture, artisanal desk goods, and custom architectural commissions for regenerative spaces.
 
-Browse current releases and specimens directly at [KĀRVA – The Sustainability Lab Shop](https://shop.sustainabilitylab.xyz/) or visit the physical fabrication bench at our Maharajgunj Research Station.`;
+Browse current releases and specimens directly at KĀRVA – The Sustainability Lab Shop: https://shop.sustainabilitylab.xyz/ or visit the physical fabrication bench at our Maharajgunj Research Station.`);
   }
 
   // 5. Water / Hydrology / GLOF / Mountains
   if (q.includes("hydro") || q.includes("water") || q.includes("flood") || q.includes("river") || q.includes("glacier") || q.includes("glof") || q.includes("himalaya")) {
-    return `### Himalayan Watershed & Cryosphere Resilience Analysis
-**Primary Source: ICIMOD — The Hindu Kush Himalaya Assessment & World Bank GLOF Health Profile**
+    return stripMarkdown(`Himalayan Watershed & Cryosphere Resilience Analysis
+Primary Source: ICIMOD — The Hindu Kush Himalaya Assessment & World Bank GLOF Health Profile
 
-1. **Cryosphere Risk**: Mountain warming outpaces global averages. Glaciers act as water towers whose retreat reorganizes dry-season lean flow and peak monsoon discharge timing.
-2. **GLOF & Cloudburst Coupling**: Glacial lake outburst floods and cloudburst events require integrated early warning, debris-basin sediment traps upstream of powerhouse intakes, and health system continuity.
-3. **Run-of-River Standards**: High-mountain hydropower facilities must shift engineering standards to maintain a minimum 15% lean-season ecological flow (e-flow) and reinforce cut slopes with deep-rooted Alnus nepalensis and vetiver grass.
-4. **Basin Approach**: Walk and monitor headwaters, farms, roads, drainage, and downstream users as a single interconnected living infrastructure.`;
+1. Cryosphere Risk: Mountain warming outpaces global averages. Glaciers act as water towers whose retreat reorganizes dry-season lean flow and peak monsoon discharge timing.
+2. GLOF & Cloudburst Coupling: Glacial lake outburst floods and cloudburst events require integrated early warning, debris-basin sediment traps upstream of powerhouse intakes, and health system continuity.
+3. Run-of-River Standards: High-mountain hydropower facilities must shift engineering standards to maintain a minimum 15% lean-season ecological flow (e-flow) and reinforce cut slopes with deep-rooted Alnus nepalensis and vetiver grass.
+4. Basin Approach: Walk and monitor headwaters, farms, roads, drainage, and downstream users as a single interconnected living infrastructure.`);
   }
 
   // 6. Climate Data / Baseline / Projections
   if (q.includes("baseline") || q.includes("projection") || q.includes("temperature") || q.includes("era5") || q.includes("ssp")) {
-    return `### Nepal Historical Baseline & Mid-Century Climate Telemetry
-**Dataset: World Bank Climate Change Knowledge Portal (ERA5 Reanalysis & CMIP6)**
+    return stripMarkdown(`Nepal Historical Baseline & Mid-Century Climate Telemetry
+Dataset: World Bank Climate Change Knowledge Portal (ERA5 Reanalysis & CMIP6)
 
-- **Historical Baseline (1995–2014)**:
-  - Annual Mean Temperature: **12.66 °C**
-  - Annual Precipitation: **2,042.28 mm**
-- **Observed Decadal Trends (Since 1970)**:
-  - Temperature Rate: **+0.17 °C / decade**
-  - Precipitation Shift: **+40.14 mm / decade**
-- **Mid-Century Projection (2040–2059, SSP3-7.0)**:
-  - Median Temperature Rise: **+1.5 °C** (10th–90th percentile uncertainty range: **1.10 °C to 2.01 °C**)
-  - Median Precipitation Shift: **+129.58 mm** (-72.55 mm to +539.67 mm range)
+Historical Baseline (1995–2014):
+• Annual Mean Temperature: 12.66 °C
+• Annual Precipitation: 2,042.28 mm
 
-*Reference: Consult \`/intelligence/knowledge/nepal-historical-climate-baseline-1995-2014\` in the Knowledge Hub for the complete evidence ledger.*`;
+Observed Decadal Trends (Since 1970):
+• Temperature Rate: +0.17 °C / decade
+• Precipitation Shift: +40.14 mm / decade
+
+Mid-Century Projection (2040–2059, SSP3-7.0):
+• Median Temperature Rise: +1.5 °C (10th–90th percentile uncertainty range: 1.10 °C to 2.01 °C)
+• Median Precipitation Shift: +129.58 mm (-72.55 mm to +539.67 mm range)
+
+Reference: Consult /intelligence/knowledge/nepal-historical-climate-baseline-1995-2014 in the Knowledge Hub for the complete evidence ledger.`);
   }
 
   // 7. Dynamic synthesis grounded in newly indexed or published knowledge articles
   const matchedEntries = searchKnowledgeEntries(query, 1);
   if (matchedEntries.length > 0) {
     const art = matchedEntries[0];
-    return `### Sustainable AI Synthesis: ${art.title}
-**Verified Knowledge Base Dispatch • Provenance: ${art.source.name} (${art.source.date})**
-*Topic: ${art.topic} • Category: ${art.category} • Evidence Level: ${art.source.level.toUpperCase()}*
+    return stripMarkdown(`Sustainable AI Synthesis: ${art.title}
+Verified Knowledge Base Dispatch • Provenance: ${art.source.name} (${art.source.date})
+Topic: ${art.topic} • Category: ${art.category} • Evidence Level: ${art.source.level.toUpperCase()}
 
-1. **Executive Finding**: ${art.summary}
-2. **Context & Ingested Analysis**:
+1. Executive Finding: ${art.summary}
+
+2. Context & Ingested Analysis:
 ${art.body}
-${art.data ? `\n3. **Empirical Telemetry**: ${JSON.stringify(art.data, null, 2)}` : ""}
+${art.data ? `\n3. Empirical Telemetry: ${JSON.stringify(art.data, null, 2)}` : ""}
 
-*Direct citation verified from [${art.source.name}](${art.source.url}).*`;
+Direct citation verified from ${art.source.name}: ${art.source.url}`);
   }
 
-  return `### Sustainable AI Intelligence Synthesis
-**Maharajgunj Research Station • Autonomous Sustainable AI Advisor**
+  return stripMarkdown(`Sustainable AI Intelligence Synthesis
+Maharajgunj Research Station • Autonomous Sustainable AI Advisor
 
 The Sustainability Lab pairs physical climate science, spatial watershed engineering, and verified knowledge indexing:
-- **Spatial Telemetry**: Catchment vulnerability and hazard exposure across Himalayan river basins.
-- **Physical Hardening**: Ductile engineering, bio-shield embankments, and decentralized municipal retention.
-- **Dynamic Knowledge Base**: All published dispatches and research reports are continuously indexed into this Sustainable AI Advisor.
-- **KĀRVA Studio**: Reclaimed vernacular Sal timber and circular biomaterial innovation.
+• Spatial Telemetry: Catchment vulnerability and hazard exposure across Himalayan river basins.
+• Physical Hardening: Ductile engineering, bio-shield embankments, and decentralized municipal retention.
+• Dynamic Knowledge Base: All published dispatches and research reports are continuously indexed into this Sustainable AI Advisor.
+• KĀRVA Studio: Reclaimed vernacular Sal timber and circular biomaterial innovation.
 
-*Ask any specific question about our programs, or select any published article to chat directly with verified source documents.*`;
+Ask any specific question about our programs, or select any published article to chat directly with verified source documents.`);
 }

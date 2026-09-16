@@ -58,7 +58,7 @@ function AIAdvisorInner() {
   const articleParam = searchParams.get("article");
   const topicParam = searchParams.get("topic");
 
-  const allArticles = getAllKnowledgeEntries();
+  const [allArticles, setAllArticles] = useState<KnowledgeEntry[]>(getAllKnowledgeEntries());
   const [activeTab, setActiveTab] = useState<"scenario" | "knowledge">("knowledge");
   const [activeScenario, setActiveScenario] = useState<string>("lab");
   const [selectedArticleSlug, setSelectedArticleSlug] = useState<string>(
@@ -68,6 +68,17 @@ function AIAdvisorInner() {
   const [inputVal, setInputVal] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    fetch("/api/editorial/articles")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.articles)) {
+          setAllArticles(data.articles);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const activeArticle = allArticles.find((a) => a.slug === selectedArticleSlug);
 
@@ -208,7 +219,7 @@ function AIAdvisorInner() {
               <div className="flex flex-col h-full">
                 <div className="text-[10px] font-mono text-[#00D4AA] uppercase tracking-widest mb-3 flex items-center justify-between">
                   <span>01 • SELECT EVIDENCE REPORT</span>
-                  <span className="text-white/40">28 SOURCED</span>
+                  <span className="text-white/40">{allArticles.length} INDEXED</span>
                 </div>
 
                 {/* Search Knowledge Filter */}

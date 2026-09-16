@@ -5,7 +5,12 @@
 
 import fs from "fs";
 import path from "path";
-import { KnowledgeEntry, knowledgeEntries as baseEntries } from "@/lib/knowledge/data";
+import {
+  KnowledgeEntry,
+  knowledgeEntries as baseEntries,
+  registerKnowledgeEntry,
+  getAllKnowledgeEntries,
+} from "@/lib/knowledge/data";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const ARTICLES_FILE = path.join(DATA_DIR, "editorial_articles.json");
@@ -79,6 +84,9 @@ export function hasArticleBeenIngested(canonicalUrl: string, slug?: string): boo
  * Returns true if added, false if duplicate.
  */
 export function addEditorialArticle(article: KnowledgeEntry): boolean {
+  // Always register in runtime memory so it is immediately searchable
+  registerKnowledgeEntry(article);
+
   if (hasArticleBeenIngested(article.source.url, article.slug)) {
     return false;
   }
@@ -94,13 +102,6 @@ export function addEditorialArticle(article: KnowledgeEntry): boolean {
  * Combines baseline knowledge articles with dynamically scraped editorial articles.
  */
 export function getCombinedKnowledgeEntries(): KnowledgeEntry[] {
-  const stored = getStoredEditorialArticles();
-  if (stored.length === 0) return baseEntries;
-
-  // Filter out any overlap just in case
-  const seenSlugs = new Set(baseEntries.map((e) => e.slug));
-  const newUnique = stored.filter((e) => !seenSlugs.has(e.slug));
-
-  return [...newUnique, ...baseEntries];
+  return getAllKnowledgeEntries();
 }
 
