@@ -4,6 +4,7 @@ import {
   parseRssXml,
   isRelevantEnvironmentalNews,
   VERIFIED_SOURCES,
+  isRelatedToNepal,
 } from "@/lib/editorial/scraper";
 
 describe("Verified Editorial Scraper", () => {
@@ -80,5 +81,69 @@ describe("Verified Editorial Scraper", () => {
 
     expect(isRelevantEnvironmentalNews(relevantItem)).toBe(true);
     expect(isRelevantEnvironmentalNews(irrelevantItem)).toBe(false);
+  });
+
+  it("whitelists all 8 verified sustainability and climate news sources requested", () => {
+    const ids = VERIFIED_SOURCES.map((s) => s.id);
+    expect(ids).toContain("sciencedaily");
+    expect(ids).toContain("theconversation");
+    expect(ids).toContain("carbonbrief");
+    expect(ids).toContain("insideclimatenews");
+    expect(ids).toContain("climatecentral");
+    expect(ids).toContain("mongabay");
+    expect(ids).toContain("e360");
+    expect(ids).toContain("ipcc");
+
+    const urls = VERIFIED_SOURCES.map((s) => s.url);
+    expect(urls).toContain("https://www.sciencedaily.com/news/earth_climate/sustainability/");
+    expect(urls).toContain("https://theconversation.com/");
+    expect(urls).toContain("https://www.carbonbrief.org/");
+    expect(urls).toContain("https://insideclimatenews.org/");
+    expect(urls).toContain("https://www.climatecentral.org/");
+    expect(urls).toContain("https://news.mongabay.com/");
+    expect(urls).toContain("https://e360.yale.edu/");
+    expect(urls).toContain("https://www.ipcc.ch/");
+  });
+
+  it("accurately detects articles related to Nepal at publishing time", () => {
+    // Matches country
+    expect(isRelatedToNepal({ country: "Nepal", title: "Global Climate Summit" })).toBe(true);
+    expect(isRelatedToNepal({ country: "nepal" })).toBe(true);
+
+    // Matches region or locality
+    expect(isRelatedToNepal({ region: "Nepal Highlands", title: "Forest Report" })).toBe(true);
+    expect(isRelatedToNepal({ locality: "Kathmandu Valley", title: "Air Quality" })).toBe(true);
+    expect(isRelatedToNepal({ locality: "Pokhara" })).toBe(true);
+
+    // Matches tags
+    expect(isRelatedToNepal({ tags: ["climate", "nepal", "adaptation"], title: "Regional Strategy" })).toBe(true);
+
+    // Matches keywords in title, summary, content, or body
+    expect(isRelatedToNepal({ title: "Monsoon Landslide Risk in Bagmati Basin" })).toBe(true);
+    expect(isRelatedToNepal({ summary: "Glacial monitoring near Dudh Koshi and Everest" })).toBe(true);
+    expect(isRelatedToNepal({ content: "Field crews surveyed Imja Tsho glacial moraine." })).toBe(true);
+    expect(isRelatedToNepal({ body: "High-altitude weather station installed in Khumbu." })).toBe(true);
+    expect(isRelatedToNepal({ title: "Agriculture restoration across Chitwan and Terai" })).toBe(true);
+
+    // Does NOT match non-Nepal global items
+    expect(
+      isRelatedToNepal({
+        title: "Amazon Rainforest Carbon Flux and Biodiversity Collapse",
+        summary: "Satellite telemetry tracks canopy density across Brazilian Amazon.",
+        country: "Brazil",
+        region: "South America",
+        tags: ["amazon", "rainforest", "brazil"],
+      })
+    ).toBe(false);
+
+    expect(
+      isRelatedToNepal({
+        title: "North Sea Offshore Wind Transmission Expansion",
+        summary: "European interconnectors link Danish wind farms to German grid.",
+        country: "Denmark",
+        region: "Europe",
+        tags: ["wind energy", "europe", "grid"],
+      })
+    ).toBe(false);
   });
 });

@@ -753,9 +753,18 @@ export function searchKnowledgeEntries(query: string, limit = 4): KnowledgeEntry
       if (bodyLower.includes(token)) score += 2;
     }
 
-    // 3. Recency boost for newly published articles
-    if (entry.id.startsWith("ed-") || entry.id.startsWith("wp-")) {
+    // 3. Recency boost for newly published and scheduled articles
+    if (entry.id.startsWith("ed-") || entry.id.startsWith("wp-") || entry.id.startsWith("sched-")) {
       score += 4;
+    }
+
+    const isScheduled =
+      entry.source.type?.toLowerCase().includes("scheduled") ||
+      entry.tags.some((t) => t.toLowerCase().includes("scheduled"));
+    if (isScheduled) {
+      if (/\b(scheduled|upcoming|future|forthcoming|planned|next|pipeline|dispatch)\b/i.test(cleanQ)) {
+        score += 25;
+      }
     }
 
     return { entry, score };

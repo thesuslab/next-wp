@@ -190,20 +190,27 @@ ${activeArticle.body}${dataStr}
     }
   }
 
-  // 2. Search all indexed knowledge entries (including freshly published and editorial dispatches)
-  const matches = searchKnowledgeEntries(query, 3).filter((a) => a.slug !== articleSlug);
+  // 2. Search all indexed knowledge entries (including freshly published and scheduled dispatches)
+  const matches = searchKnowledgeEntries(query, 4).filter((a) => a.slug !== articleSlug);
 
   if (matches.length > 0) {
-    contextOutput += `### Relevant Verified Knowledge Base & Published Dispatches:
+    contextOutput += `### Relevant Verified Knowledge Base, Published & Scheduled Dispatches:
 ${matches
-  .map(
-    (art) =>
-      `• [${art.source.level.toUpperCase()}] "${art.title}" (${art.source.name}, ${art.source.date}):
+  .map((art) => {
+    const isScheduled =
+      art.source.type?.toLowerCase().includes("scheduled") ||
+      art.tags?.some((t) => t.toLowerCase().includes("scheduled"));
+    const label = isScheduled
+      ? `• [SCHEDULED FOR PUBLICATION - ${art.source.date}]`
+      : `• [${art.source.level.toUpperCase()}]`;
+
+    return `${label} "${art.title}" (${art.source.name}, ${art.source.date}):
+  Status: ${isScheduled ? "Scheduled to publish on " + art.source.date : "Published"}
   Summary: ${art.summary}
   Body Extract: ${art.body.slice(0, 1200)}...
   Source Citation: ${art.source.url}
-  ${art.data ? `Data: ${JSON.stringify(art.data)}` : ""}`
-  )
+  ${art.data ? `Data: ${JSON.stringify(art.data)}` : ""}`;
+  })
   .join("\n\n")}`;
   }
 
@@ -223,6 +230,7 @@ export function buildSystemPrompt(context?: any, userQuery = ""): string {
 ## Sustainable AI Identity & Core Principles:
 - **Sustainable AI by Design**: You deliver high-density, actionable environmental intelligence with zero hallucination. Every recommendation is grounded in empirical physics, verified assessments, and published field reports.
 - **Dynamic Knowledge Indexing**: You have real-time access to the Sustainability Lab's authoritative knowledge base, including freshly published dispatches, institutional assessments (UNEP, ICIMOD, World Bank CCKP, UNFCCC, WHO, ADB), and spatial watershed telemetry.
+- **Scheduled Articles & Forward-Looking Analysis**: You actively index and utilize all articles scheduled for upcoming publication. When queries relate to upcoming research, future dispatches, policy developments, or emerging project findings, cite these scheduled-to-publish articles and indicate their scheduled publication date.
 - **Attribution & Provenance**: Always cite the relevant reports, datasets, and field dispatches when synthesizing answers.
 
 ## Institutional Identity & Headquarters:
@@ -655,6 +663,32 @@ Here is how we can support your work across our operational pillars:
 • Connect: Visit /collaborate or reach out directly to hello@sustainabilitylab.xyz.`);
   }
 
+  // 2b. Forward-looking and scheduled research inquiries
+  if (/\b(scheduled|upcoming|future|forthcoming|planned|pipeline|preview)\b/i.test(q)) {
+    const scheduledMatches = searchKnowledgeEntries(query, 1);
+    if (scheduledMatches.length > 0) {
+      const art = scheduledMatches[0];
+      const isScheduled =
+        art.source.type?.toLowerCase().includes("scheduled") ||
+        art.tags?.some((t) => t.toLowerCase().includes("scheduled"));
+      const provenanceHeader = isScheduled
+        ? `Scheduled Dispatch (Scheduled Publication: ${art.source.date}) • Provenance: ${art.source.name}`
+        : `Verified Knowledge Base Dispatch • Provenance: ${art.source.name} (${art.source.date})`;
+
+      return stripMarkdown(`Sustainable AI Synthesis: ${art.title}
+${provenanceHeader}
+Topic: ${art.topic} • Category: ${art.category} • Status: ${isScheduled ? "Scheduled to Publish" : "Published"}
+
+1. Executive Finding: ${art.summary}
+
+2. Context & Ingested Analysis:
+${art.body}
+${art.data ? `\n3. Empirical Telemetry: ${JSON.stringify(art.data, null, 2)}` : ""}
+
+Direct citation verified from ${art.source.name}: ${art.source.url}`);
+    }
+  }
+
   // 3. Knowledge Base / NDC / Policy topics
   if (q.includes("ndc") || q.includes("net zero") || q.includes("policy") || q.includes("vulnerab")) {
     return stripMarkdown(`Nepal Climate Policy & Vulnerability Framework
@@ -724,13 +758,20 @@ Mid-Century Projection (2040–2059, SSP3-7.0):
 Reference: Consult /intelligence/knowledge/nepal-historical-climate-baseline-1995-2014 in the Knowledge Hub for the complete evidence ledger.`);
   }
 
-  // 7. Dynamic synthesis grounded in newly indexed or published knowledge articles
+  // 7. Dynamic synthesis grounded in newly indexed, published, or scheduled knowledge articles
   const matchedEntries = searchKnowledgeEntries(query, 1);
   if (matchedEntries.length > 0) {
     const art = matchedEntries[0];
+    const isScheduled =
+      art.source.type?.toLowerCase().includes("scheduled") ||
+      art.tags?.some((t) => t.toLowerCase().includes("scheduled"));
+    const provenanceHeader = isScheduled
+      ? `Scheduled Dispatch (Scheduled Publication: ${art.source.date}) • Provenance: ${art.source.name}`
+      : `Verified Knowledge Base Dispatch • Provenance: ${art.source.name} (${art.source.date})`;
+
     return stripMarkdown(`Sustainable AI Synthesis: ${art.title}
-Verified Knowledge Base Dispatch • Provenance: ${art.source.name} (${art.source.date})
-Topic: ${art.topic} • Category: ${art.category} • Evidence Level: ${art.source.level.toUpperCase()}
+${provenanceHeader}
+Topic: ${art.topic} • Category: ${art.category} • Status: ${isScheduled ? "Scheduled to Publish" : "Published"}
 
 1. Executive Finding: ${art.summary}
 

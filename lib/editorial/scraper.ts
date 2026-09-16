@@ -71,17 +71,153 @@ export const VERIFIED_SOURCES: VerifiedSourceDefinition[] = [
     country: "Global",
   },
   {
+    id: "sciencedaily",
+    name: "ScienceDaily: Sustainability News",
+    url: "https://www.sciencedaily.com/news/earth_climate/sustainability/",
+    feedUrl: "https://www.sciencedaily.com/rss/earth_climate/sustainability.xml",
+    institutionType: "peer-reviewed journalism",
+    evidenceLevel: "primary",
+    defaultCategory: "Environment",
+    region: "Global",
+    country: "Global",
+  },
+  {
+    id: "theconversation",
+    name: "The Conversation",
+    url: "https://theconversation.com/",
+    feedUrl: "https://theconversation.com/global/articles.atom",
+    institutionType: "peer-reviewed journalism",
+    evidenceLevel: "synthesis",
+    defaultCategory: "Climate",
+    region: "Global",
+    country: "Global",
+  },
+  {
+    id: "carbonbrief",
+    name: "Carbon Brief",
+    url: "https://www.carbonbrief.org/",
+    feedUrl: "https://www.carbonbrief.org/feed/",
+    institutionType: "peer-reviewed journalism",
+    evidenceLevel: "synthesis",
+    defaultCategory: "Climate",
+    region: "Global",
+    country: "Global",
+  },
+  {
+    id: "insideclimatenews",
+    name: "Inside Climate News",
+    url: "https://insideclimatenews.org/",
+    feedUrl: "https://insideclimatenews.org/feed/",
+    institutionType: "peer-reviewed journalism",
+    evidenceLevel: "primary",
+    defaultCategory: "Climate",
+    region: "Global / North America",
+    country: "Global",
+  },
+  {
+    id: "climatecentral",
+    name: "Climate Central",
+    url: "https://www.climatecentral.org/",
+    feedUrl: "https://www.climatecentral.org/feed",
+    institutionType: "peer-reviewed journalism",
+    evidenceLevel: "primary",
+    defaultCategory: "Climate",
+    region: "Global",
+    country: "Global",
+  },
+  {
     id: "mongabay",
-    name: "Mongabay Environmental News (South Asia & Himalaya)",
-    url: "https://news.mongabay.com",
+    name: "Mongabay",
+    url: "https://news.mongabay.com/",
     feedUrl: "https://news.mongabay.com/feed/",
     institutionType: "peer-reviewed journalism",
     evidenceLevel: "primary",
     defaultCategory: "Environment",
-    region: "South Asia & Himalayas",
-    country: "Nepal",
+    region: "Global",
+    country: "Global",
+  },
+  {
+    id: "e360",
+    name: "Yale Environment 360 (E360)",
+    url: "https://e360.yale.edu/",
+    feedUrl: "https://e360.yale.edu/feed",
+    institutionType: "peer-reviewed journalism",
+    evidenceLevel: "synthesis",
+    defaultCategory: "Environment",
+    region: "Global",
+    country: "Global",
+  },
+  {
+    id: "ipcc",
+    name: "IPCC — Intergovernmental Panel on Climate Change",
+    url: "https://www.ipcc.ch/",
+    feedUrl: "https://www.ipcc.ch/feed/",
+    institutionType: "intergovernmental",
+    evidenceLevel: "primary",
+    defaultCategory: "Climate",
+    region: "Global",
+    country: "Global",
   },
 ];
+
+/**
+ * Detects whether a news item or article is specifically related to Nepal
+ * (by country, region, locality, or text keywords).
+ * Used at publishing time to ensure news related to Nepal is never branded
+ * or shown under EDITORIAL 6:00 AM FEED • VERIFIED.
+ */
+export function isRelatedToNepal(item: {
+  title?: string;
+  summary?: string;
+  content?: string;
+  body?: string;
+  country?: string;
+  region?: string;
+  locality?: string | null;
+  tags?: string[];
+}): boolean {
+  if (!item) return false;
+
+  const country = (item.country || "").trim().toLowerCase();
+  if (country === "nepal") return true;
+
+  const region = (item.region || "").trim().toLowerCase();
+  if (region.includes("nepal")) return true;
+
+  const locality = (item.locality || "").trim().toLowerCase();
+  if (locality.includes("nepal")) return true;
+
+  if (Array.isArray(item.tags) && item.tags.some((t) => t.toLowerCase() === "nepal")) {
+    return true;
+  }
+
+  const tagsStr = Array.isArray(item.tags) ? item.tags.join(" ") : "";
+  const combined = `${item.title || ""} ${item.summary || ""} ${item.content || ""} ${item.body || ""} ${item.locality || ""} ${item.region || ""} ${item.country || ""} ${tagsStr}`.toLowerCase();
+  const nepalPatterns = [
+    /\bnepal\b/i,
+    /\bnepali\b/i,
+    /\bnepalese\b/i,
+    /\bkathmandu\b/i,
+    /\bpokhara\b/i,
+    /\blalitpur\b/i,
+    /\bbhaktapur\b/i,
+    /\bchitwan\b/i,
+    /\bbagmati\b/i,
+    /\bdudh\s+koshi\b/i,
+    /\bgandaki\b/i,
+    /\bkarnali\b/i,
+    /\bkoshi\b/i,
+    /\bmaharajgunj\b/i,
+    /\bkhumbu\b/i,
+    /\beverest\b/i,
+    /\bsagarmatha\b/i,
+    /\bimja\s+tsho\b/i,
+    /\bmustang\b/i,
+    /\bterai\b/i,
+  ];
+
+  return nepalPatterns.some((pattern) => pattern.test(combined));
+}
 
 /**
  * Clean raw text from HTML tags, CDATA wrappers, entities, and excessive whitespace.

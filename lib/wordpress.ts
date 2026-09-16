@@ -220,6 +220,22 @@ export async function getRecentPosts(filterParams?: {
   ]);
 }
 
+/**
+ * Fetches scheduled (future) posts from WordPress so they can be indexed into the AI Advisor.
+ */
+export async function getScheduledPosts(): Promise<Post[]> {
+  const query: QueryParams = {
+    _embed: true,
+    per_page: 100,
+    status: "future",
+  };
+
+  return wordpressFetchGraceful<Post[]>("/wp-json/wp/v2/posts", [], query, [
+    "wordpress",
+    "posts-scheduled",
+  ]);
+}
+
 export async function getPostById(id: number): Promise<Post> {
   return wordpressFetch<Post>(`/wp-json/wp/v2/posts/${id}`);
 }

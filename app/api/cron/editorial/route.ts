@@ -4,6 +4,7 @@ import {
   fetchVerifiedSourceFeed,
   VERIFIED_SOURCES,
   RawEditorialItem,
+  isRelatedToNepal,
 } from "@/lib/editorial/scraper";
 import { rewriteEditorialItem } from "@/lib/editorial/rewriter";
 import { addEditorialArticle, hasArticleBeenIngested } from "@/lib/editorial/store";
@@ -63,8 +64,12 @@ async function handleEditorialIngestion(req: Request) {
     }
 
     // 2. Filter for novel, un-ingested articles unless force=true
+    // Ensure news related to Nepal at publishing time is NOT shown/ingested into the 6:00 AM verified feed
     const candidateItems: RawEditorialItem[] = [];
     for (const item of rawItems) {
+      if (isRelatedToNepal(item)) {
+        continue;
+      }
       if (force || !hasArticleBeenIngested(item.canonicalUrl)) {
         candidateItems.push(item);
       }

@@ -9,6 +9,7 @@ import {
   getKnowledgeTopics,
 } from "@/lib/knowledge/data";
 import { InlineMarkdown } from "@/components/knowledge/MarkdownViewer";
+import { isRelatedToNepal } from "@/lib/editorial/scraper";
 
 const categories = [
   "ALL",
@@ -39,6 +40,12 @@ export default function KnowledgePage() {
       })
       .catch(() => {});
   }, []);
+
+  const editorialIngestedCount = useMemo(() => {
+    return articles.filter(
+      (art) => art.id.startsWith("ed-") && !isRelatedToNepal(art)
+    ).length;
+  }, [articles]);
 
   const allTopics = useMemo(() => {
     return Array.from(new Set(articles.map((e) => e.topic))).sort();
@@ -102,9 +109,9 @@ export default function KnowledgePage() {
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-data/10 border border-data/30 text-data text-xs font-mono mb-4">
             <span className="w-2 h-2 rounded-full bg-data animate-pulse" />
             {articles.length} VERIFIED EVIDENCE ENTRIES • SOURCE-LINKED
-            {articles.length > knowledgeEntries.length && (
+            {editorialIngestedCount > 0 && (
               <span className="text-[10px] bg-data/20 text-data px-1.5 py-0.5 rounded font-semibold">
-                +{articles.length - knowledgeEntries.length} INGESTED (6:00 AM FEED)
+                +{editorialIngestedCount} INGESTED (6:00 AM FEED)
               </span>
             )}
           </div>
@@ -234,12 +241,23 @@ export default function KnowledgePage() {
               className="p-6 rounded-2xl bg-card border border-border/70 hover:border-data/60 transition-all flex flex-col justify-between group shadow-sm hover:shadow-md"
             >
               <div>
-                {/* Editorial Daily Badge if dynamically ingested */}
-                {art.id.startsWith("ed-") && (
+                {/* Editorial Daily Badge if dynamically ingested and NOT related to Nepal */}
+                {art.id.startsWith("ed-") && !isRelatedToNepal(art) && (
                   <div className="mb-2.5">
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-data/15 border border-data/30 text-data text-[10px] font-mono font-semibold">
                       <span className="w-1.5 h-1.5 rounded-full bg-data animate-pulse" />
                       EDITORIAL 6:00 AM FEED • VERIFIED
+                    </span>
+                  </div>
+                )}
+
+                {/* Scheduled to Publish Badge if scheduled dispatch */}
+                {(art.source.type?.toLowerCase().includes("scheduled") ||
+                  art.tags?.some((t) => t.toLowerCase().includes("scheduled"))) && (
+                  <div className="mb-2.5">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] font-mono font-semibold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                      SCHEDULED FOR PUBLICATION • {art.source.date}
                     </span>
                   </div>
                 )}

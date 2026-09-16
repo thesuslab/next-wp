@@ -34,12 +34,19 @@ export function cleanContent(html: string): string {
  * so it is immediately searchable and cited by the Sustainable AI Advisor.
  */
 export function indexWordPressPost(post: Post): KnowledgeEntry | null {
-  if (!post || post.status !== "publish") return null;
+  if (!post) return null;
+  const status = (post.status || "publish").toLowerCase();
+  if (status !== "publish" && status !== "future" && status !== "scheduled") {
+    return null;
+  }
 
+  const isScheduled = status === "future" || status === "scheduled";
   const rawTitle = post.title?.rendered || "Untitled Post";
   const cleanTitle = cleanContent(rawTitle);
   const cleanExcerpt = cleanContent(post.excerpt?.rendered || "");
   const cleanBody = cleanContent(post.content?.rendered || "");
+
+  const scheduledDate = (post.date || new Date().toISOString()).split("T")[0];
 
   const entry: KnowledgeEntry = {
     id: `wp-${post.id}`,
@@ -48,19 +55,23 @@ export function indexWordPressPost(post: Post): KnowledgeEntry | null {
     kind: "research",
     summary: cleanExcerpt || (cleanBody.length > 240 ? cleanBody.slice(0, 240) + "..." : cleanBody),
     body: cleanBody || cleanExcerpt,
-    topic: "Editorial & Field Dispatches",
+    topic: isScheduled ? "Upcoming Research & Scheduled Dispatches" : "Editorial & Field Dispatches",
     category: "Policy",
     region: "Himalaya / South Asia",
     locality: null,
     country: "Nepal",
     source: {
-      name: "Sustainability Lab Publishing • WordPress CMS",
+      name: isScheduled
+        ? "Sustainability Lab Publishing • Scheduled Dispatch"
+        : "Sustainability Lab Publishing • WordPress CMS",
       url: post.link || `/posts/${post.slug}`,
-      date: (post.date || new Date().toISOString()).split("T")[0],
-      type: "published article",
+      date: scheduledDate,
+      type: isScheduled ? "scheduled article" : "published article",
       level: "primary",
     },
-    tags: ["editorial", "published", "field dispatch", "sustainability lab"],
+    tags: isScheduled
+      ? ["scheduled", "upcoming publication", "scheduled article", "editorial", "field dispatch", "sustainability lab"]
+      : ["editorial", "published", "field dispatch", "sustainability lab"],
     data: null,
     readTime: `${Math.max(1, Math.ceil(cleanBody.split(/\s+/).length / 200))} min read`,
     seoTitle: `${cleanTitle} | Sustainability Lab Dispatch`,
@@ -70,10 +81,41 @@ export function indexWordPressPost(post: Post): KnowledgeEntry | null {
   const added = addEditorialArticle(entry);
   if (added) {
     console.info(
-      `[Sustainable AI Indexer] Indexed published WordPress post into AI Advisor: "${entry.title}" (${entry.slug})`
+      `[Sustainable AI Indexer] Indexed ${isScheduled ? "scheduled" : "published"} WordPress post into AI Advisor: "${entry.title}" (${entry.slug})`
     );
   }
   return entry;
+}
+
+/**
+ * Indexes an article scheduled for future publication into the AI Advisor knowledge base.
+ */
+export function indexScheduledArticle(
+  article: Partial<KnowledgeEntry> & {
+    title: string;
+    body: string;
+    scheduledDate?: string;
+  }
+): KnowledgeEntry {
+  const scheduledDate =
+    article.scheduledDate ||
+    article.source?.date ||
+    new Date().toISOString().split("T")[0];
+
+  return indexArticleIntoKnowledge({
+    ...article,
+    id: article.id || `sched-${Date.now()}`,
+    source: {
+      name: article.source?.name || "Sustainability Lab Scheduled Dispatch",
+      url: article.source?.url || `/intelligence/knowledge/${article.slug || "dispatch"}`,
+      date: scheduledDate,
+      type: "scheduled article",
+      level: article.source?.level || "primary",
+    },
+    tags: Array.from(
+      new Set([...(article.tags || []), "scheduled", "upcoming publication", "scheduled article"])
+    ),
+  });
 }
 
 /**

@@ -129,5 +129,33 @@ Check \`code\` here.`;
     expect(cleaned).toContain("Critical Data");
     expect(cleaned).toContain("https://example.com/report");
   });
+
+  it("grounds AI Advisor in scheduled-to-publish articles", async () => {
+    const { indexScheduledArticle } = await import("@/lib/knowledge/indexer");
+
+    indexScheduledArticle({
+      title: "Scheduled Policy Brief: Himalayan Carbon Taxation 2027",
+      body: "Draft guidelines detailing border carbon adjustments and regional mitigation funds slated for release in 2027.",
+      summary: "Policy brief on Himalayan carbon taxation slated for 2027 release.",
+      topic: "Policy",
+      category: "Policy",
+      scheduledDate: "2027-01-15",
+      tags: ["taxation", "carbon", "policy", "scheduled"],
+    });
+
+    const prompt = buildSystemPrompt(null, "what are the scheduled policy briefs on carbon taxation");
+    expect(prompt).toContain("Scheduled Articles & Forward-Looking Analysis");
+    expect(prompt).toContain("Scheduled Policy Brief: Himalayan Carbon Taxation 2027");
+    expect(prompt).toContain("SCHEDULED FOR PUBLICATION - 2027-01-15");
+
+    const response = await queryAIProvider([
+      { role: "user", content: "tell me about the scheduled policy brief on carbon taxation" },
+    ]);
+    expect(response.text).toBeTruthy();
+    expect(response.text).toContain("Scheduled Policy Brief: Himalayan Carbon Taxation 2027");
+    // Ensure output is also markdown-free
+    expect(response.text).not.toMatch(/\*\*[^*]+\*\*/);
+    expect(response.text).not.toMatch(/^#{1,6}\s/m);
+  });
 });
 
