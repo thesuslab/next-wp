@@ -23,6 +23,17 @@ export async function POST(req: Request) {
 
     const result = await sendContactEmail(payload);
 
+    if (!result.success) {
+      return NextResponse.json(
+        {
+          error: "Email delivery failed.",
+          details: result.error || "SMTP service is unavailable.",
+          simulated: result.simulated,
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       message: "Inquiry successfully received and routed to Directorate.",

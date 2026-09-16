@@ -1,3 +1,5 @@
+import bundledEditorialArticles from "@/data/editorial_articles.json";
+
 export interface KnowledgeSource {
   name: string;
   url: string;
@@ -590,6 +592,18 @@ The most humane intervention is often the one that reduces exposure while expand
   }),
 ];
 
+const staticEditorialEntries: KnowledgeEntry[] = Array.isArray(bundledEditorialArticles)
+  ? (bundledEditorialArticles as KnowledgeEntry[])
+  : [];
+
+/**
+ * Baseline repository of all knowledge and editorial entries, fully bundled for universal access.
+ */
+export const combinedKnowledgeEntries: KnowledgeEntry[] = [
+  ...staticEditorialEntries,
+  ...knowledgeEntries,
+];
+
 /**
  * Query helper to retrieve all entries, dynamically merging baseline knowledge seed
  * with newly ingested and verified editorial articles on the server.
@@ -609,7 +623,7 @@ export function getAllKnowledgeEntries(): KnowledgeEntry[] {
       // Fallback cleanly to static baseline
     }
   }
-  return knowledgeEntries;
+  return combinedKnowledgeEntries;
 }
 
 /**

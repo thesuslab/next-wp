@@ -9,33 +9,31 @@ export interface ContactEmailPayload {
 }
 
 /**
+ * Case-insensitive and alias-aware environment variable lookup.
+ */
+function getEnvValue(keys: string[], fallback = ""): string {
+  for (const key of keys) {
+    if (process.env[key]) return process.env[key]!;
+  }
+  const allKeys = Object.keys(process.env);
+  for (const key of keys) {
+    const lower = key.toLowerCase();
+    const match = allKeys.find((k) => k.toLowerCase() === lower);
+    if (match && process.env[match]) return process.env[match]!;
+  }
+  return fallback;
+}
+
+/**
  * Configure Nodemailer transport using environment variables.
- * Supports SMTP_username / smtp_username, smtp_password / SMTP_password,
- * and smtp_server / SMTP_server / SMTP_HOST.
+ * Supports any case convention (SMTP_SERVER, smtp_server, SMTP_username, etc.)
  */
 export function getMailTransporter() {
-  const host =
-    process.env.SMTP_SERVER ||
-    process.env.smtp_server ||
-    process.env.SMTP_HOST ||
-    process.env.smtp_host ||
-    "";
-  const user =
-    process.env.SMTP_USERNAME ||
-    process.env.smtp_username ||
-    process.env.SMTP_USER ||
-    process.env.smtp_user ||
-    "";
-  const pass =
-    process.env.SMTP_PASSWORD ||
-    process.env.smtp_password ||
-    process.env.SMTP_PASS ||
-    process.env.smtp_pass ||
-    "";
-  const port = parseInt(
-    process.env.SMTP_PORT || process.env.smtp_port || "465",
-    10
-  );
+  const host = getEnvValue(["SMTP_SERVER", "SMTP_HOST", "MAIL_SERVER", "MAIL_HOST"]);
+  const user = getEnvValue(["SMTP_USERNAME", "SMTP_USER", "MAIL_USERNAME", "MAIL_USER"]);
+  const pass = getEnvValue(["SMTP_PASSWORD", "SMTP_PASS", "MAIL_PASSWORD", "MAIL_PASS"]);
+  const portStr = getEnvValue(["SMTP_PORT", "MAIL_PORT"], "465");
+  const port = parseInt(portStr, 10) || 465;
   const secure = port === 465;
 
   if (!host || !user || !pass) {
@@ -50,6 +48,9 @@ export function getMailTransporter() {
       user,
       pass,
     },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 }
 
@@ -58,11 +59,15 @@ export function getMailTransporter() {
  */
 export async function sendContactEmail(payload: ContactEmailPayload) {
   const transporter = getMailTransporter();
-  const directorateEmail =
-    process.env.DIRECTORATE_EMAIL ||
-    process.env.SMTP_USERNAME ||
-    process.env.smtp_username ||
-    "hello@sustainabilitylab.xyz";
+  const user = getEnvValue(["SMTP_USERNAME", "SMTP_USER", "MAIL_USERNAME", "MAIL_USER"]);
+  const fromEmail = getEnvValue(
+    ["SMTP_FROM", "MAIL_FROM", "SMTP_USERNAME", "SMTP_USER"],
+    user || "hello@sustainabilitylab.xyz"
+  );
+  const directorateEmail = getEnvValue(
+    ["DIRECTORATE_EMAIL", "SMTP_USERNAME", "SMTP_FROM"],
+    "hello@sustainabilitylab.xyz"
+  );
 
   const emailBodyText = `
 New Project Intake / Inquiry Received via Sustainability Lab Portal
@@ -127,16 +132,22 @@ Headquarters: Maharajgunj Research Station, Kathmandu Valley (27.7408° N, 85.33
   `;
 
   if (!transporter) {
-    console.warn(
-      "[SMTP] Mail transporter not configured. Inquiry logged:",
-      payload
-    );
-    return { success: true, simulated: true };
+    const host = getEnvValue(["SMTP_SERVER", "SMTP_HOST", "MAIL_SERVER", "MAIL_HOST"]);
+    console.error("[SMTP] Mail transporter not configured. Missing required credentials:", {
+      hasHost: Boolean(host),
+      hasUser: Boolean(user),
+      hasFromEmail: Boolean(fromEmail),
+    });
+    return {
+      success: false,
+      simulated: true,
+      error: "SMTP transporter is not configured. Please check your environment variables.",
+    };
   }
 
   // 1. Send notification to Directorate
   await transporter.sendMail({
-    from: `"Sustainability Lab Intake" <${directorateEmail}>`,
+    from: `"Sustainability Lab Intake" <${fromEmail}>`,
     to: directorateEmail,
     replyTo: payload.email,
     subject: `[Intake: ${payload.intent.toUpperCase()}] Project Brief from ${payload.name}`,
@@ -147,7 +158,7 @@ Headquarters: Maharajgunj Research Station, Kathmandu Valley (27.7408° N, 85.33
   // 2. Send acknowledgment to the sender
   try {
     await transporter.sendMail({
-      from: `"The Sustainability Lab Directorate" <${directorateEmail}>`,
+      from: `"The Sustainability Lab Directorate" <${fromEmail}>`,
       to: payload.email,
       subject: `Inquiry Received: Sustainability Lab Directorate Intake`,
       text: `Hello ${payload.name},\n\nThank you for reaching out to The Sustainability Lab. We have received your project brief under "${payload.intent}".\n\nOur Directorate and research team at the Maharajgunj Research Station review incoming proposals and inquiries and will follow up within 2 business days.\n\nWarm regards,\nDirectorate Secretariat\nThe Sustainability Lab\nMaharajgunj, Kathmandu Valley, Nepal\nhttps://sustainabilitylab.xyz`,
@@ -167,8 +178,8 @@ Headquarters: Maharajgunj Research Station, Kathmandu Valley (27.7408° N, 85.33
         </div>
       `,
     });
-  } catch (ackError) {
-    console.warn("[SMTP] Confirmation to sender failed:", ackError);
+  } catch (ackError: any) {
+    console.warn("[SMTP] Confirmation to sender failed:", ackError?.message || ackError);
   }
 
   return { success: true, simulated: false };

@@ -6,9 +6,17 @@
 import fs from "fs";
 import path from "path";
 import { KnowledgeEntry, knowledgeEntries as baseEntries } from "@/lib/knowledge/data";
+import bundledEditorialArticles from "@/data/editorial_articles.json";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const ARTICLES_FILE = path.join(DATA_DIR, "editorial_articles.json");
+
+// In-memory cache for dynamic additions during runtime
+let memoryEditorialArticles: KnowledgeEntry[] | null = null;
+
+const staticSeedArticles: KnowledgeEntry[] = Array.isArray(bundledEditorialArticles)
+  ? (bundledEditorialArticles as KnowledgeEntry[])
+  : [];
 
 /**
  * Ensure storage directory and JSON file exist safely.
@@ -19,39 +27,64 @@ function ensureStorageFile(): void {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     if (!fs.existsSync(ARTICLES_FILE)) {
-      fs.writeFileSync(ARTICLES_FILE, JSON.stringify([], null, 2), "utf-8");
+      fs.writeFileSync(
+        ARTICLES_FILE,
+        JSON.stringify(staticSeedArticles, null, 2),
+        "utf-8"
+      );
     }
   } catch (err: any) {
-    console.error("[Editorial Store] Error ensuring storage file:", err.message);
+    // Expected on read-only filesystems (Vercel, AWS Lambda, Docker read-only)
+    console.warn("[Editorial Store] File system note:", err.message);
   }
 }
 
 /**
- * Retrieve all dynamically stored editorial articles.
+ * Retrieve all dynamically stored editorial articles, falling back cleanly to bundled seed.
  */
 export function getStoredEditorialArticles(): KnowledgeEntry[] {
-  ensureStorageFile();
-  try {
-    if (!fs.existsSync(ARTICLES_FILE)) return [];
-    const content = fs.readFileSync(ARTICLES_FILE, "utf-8");
-    if (!content.trim()) return [];
-    const parsed = JSON.parse(content);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (err: any) {
-    console.error("[Editorial Store] Error reading editorial articles:", err.message);
-    return [];
+  if (typeof window !== "undefined") {
+    return memoryEditorialArticles || staticSeedArticles;
   }
+
+  try {
+    ensureStorageFile();
+    if (fs.existsSync(ARTICLES_FILE)) {
+      const content = fs.readFileSync(ARTICLES_FILE, "utf-8");
+      if (content.trim()) {
+        const parsed = JSON.parse(content);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Merge disk articles with bundled seed articles to ensure complete archive
+          const seenSlugs = new Set<string>();
+          const merged: KnowledgeEntry[] = [];
+          for (const item of [...parsed, ...staticSeedArticles]) {
+            if (item && item.slug && !seenSlugs.has(item.slug)) {
+              seenSlugs.add(item.slug);
+              merged.push(item);
+            }
+          }
+          memoryEditorialArticles = merged;
+          return merged;
+        }
+      }
+    }
+  } catch (err: any) {
+    console.warn("[Editorial Store] Error reading disk storage, using bundled baseline:", err.message);
+  }
+
+  return memoryEditorialArticles || staticSeedArticles;
 }
 
 /**
- * Persist articles list to disk.
+ * Persist articles list to disk and update in-memory cache.
  */
 export function saveEditorialArticles(articles: KnowledgeEntry[]): void {
-  ensureStorageFile();
+  memoryEditorialArticles = articles;
   try {
+    ensureStorageFile();
     fs.writeFileSync(ARTICLES_FILE, JSON.stringify(articles, null, 2), "utf-8");
   } catch (err: any) {
-    console.error("[Editorial Store] Error writing editorial articles:", err.message);
+    console.warn("[Editorial Store] Could not write to disk (kept in memory):", err.message);
   }
 }
 

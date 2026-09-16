@@ -33,4 +33,11 @@ describe("Editorial Article Store & Deduplication", () => {
     const uniqueSlugs = new Set(slugs);
     expect(uniqueSlugs.size).toBe(slugs.length);
   });
+
+  it("guarantees verified bundled editorial articles exist in production", () => {
+    const articles = getStoredEditorialArticles();
+    expect(articles.length).toBeGreaterThanOrEqual(8);
+    const combined = getCombinedKnowledgeEntries();
+    expect(combined.length).toBeGreaterThanOrEqual(36);
+  });
 });

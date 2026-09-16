@@ -12,6 +12,9 @@ const isStandalone =
 const nextConfig: NextConfig = {
   // Standalone is for Docker/Railway; standard output is used locally and on Vercel
   ...(isStandalone ? { output: "standalone" as const } : {}),
+  outputFileTracingIncludes: {
+    "/**": ["./data/**/*"],
+  },
   images: {
     remotePatterns: [
       {

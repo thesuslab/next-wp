@@ -12,7 +12,8 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "create:wp-content": "node scripts/create-wp-content.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { KnowledgeEntry } from "@/lib/knowledge/data";
+import editorialSeedArticles from "@/data/editorial_articles.json";
 
 interface FieldNoteArticle {
   id: string;
@@ -68,7 +69,9 @@ const categories = ["ALL", "FIELD NOTES", "RESEARCH", "CLIMATE", "TECHNOLOGY", "
 
 export default function FieldNotesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
-  const [editorialArticles, setEditorialArticles] = useState<KnowledgeEntry[]>([]);
+  const [editorialArticles, setEditorialArticles] = useState<KnowledgeEntry[]>(
+    (Array.isArray(editorialSeedArticles) ? editorialSeedArticles : []) as KnowledgeEntry[]
+  );
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
 
