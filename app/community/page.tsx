@@ -71,6 +71,42 @@ export default function CommunityPage() {
   const [selectedType, setSelectedType] = useState<string>("ALL");
   const [rsvpEvent, setRsvpEvent] = useState<CommunityEvent | null>(null);
   const [rsvpSuccess, setRsvpSuccess] = useState(false);
+  const [rsvpName, setRsvpName] = useState("");
+  const [rsvpEmail, setRsvpEmail] = useState("");
+  const [rsvpWork, setRsvpWork] = useState("");
+  const [rsvpSubmitting, setRsvpSubmitting] = useState(false);
+  const [rsvpError, setRsvpError] = useState<string | null>(null);
+
+  const handleRsvpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rsvpName.trim() || !rsvpEmail.trim() || !rsvpEvent) return;
+    setRsvpSubmitting(true);
+    setRsvpError(null);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          intent: "Workshop & Session RSVP",
+          name: rsvpName.trim(),
+          email: rsvpEmail.trim(),
+          primaryDetails: `RSVP for: ${rsvpEvent.title} (${rsvpEvent.date} • ${rsvpEvent.time}) at Maharajgunj Lab Station.`,
+          secondaryDetails: rsvpWork.trim() ? `Work / Research Focus: ${rsvpWork.trim()}` : undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to submit RSVP.");
+      }
+
+      setRsvpSuccess(true);
+    } catch (err: any) {
+      setRsvpError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setRsvpSubmitting(false);
+    }
+  };
 
   const filteredEvents = selectedType === "ALL"
     ? events
@@ -270,44 +306,56 @@ export default function CommunityPage() {
                   ✓ Seat confirmed! We sent an invitation to your calendar.
                 </div>
               ) : (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    setRsvpSuccess(true);
-                  }}
-                  className="space-y-4"
-                >
+                <form onSubmit={handleRsvpSubmit} className="space-y-4">
+                  {rsvpError && (
+                    <div className="p-3 rounded bg-crimson/10 border border-crimson/30 text-crimson text-xs font-mono">
+                      {rsvpError}
+                    </div>
+                  )}
                   <div>
-                    <label className="block text-muted-foreground mb-1">Your Full Name</label>
+                    <label className="block text-muted-foreground mb-1 text-xs font-mono uppercase tracking-wider">
+                      Your Full Name
+                    </label>
                     <input
                       required
                       type="text"
+                      value={rsvpName}
+                      onChange={(e) => setRsvpName(e.target.value)}
                       placeholder="e.g. Maya Shrestha"
-                      className="w-full px-3 py-2 rounded bg-background border border-border text-foreground focus:border-data focus:outline-none"
+                      className="w-full px-3 py-2 rounded bg-background border border-border text-foreground focus:border-data focus:outline-none text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-muted-foreground mb-1">Email Address</label>
+                    <label className="block text-muted-foreground mb-1 text-xs font-mono uppercase tracking-wider">
+                      Email Address
+                    </label>
                     <input
                       required
                       type="email"
+                      value={rsvpEmail}
+                      onChange={(e) => setRsvpEmail(e.target.value)}
                       placeholder="maya@example.com"
-                      className="w-full px-3 py-2 rounded bg-background border border-border text-foreground focus:border-data focus:outline-none"
+                      className="w-full px-3 py-2 rounded bg-background border border-border text-foreground focus:border-data focus:outline-none text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-muted-foreground mb-1">What are you working on?</label>
+                    <label className="block text-muted-foreground mb-1 text-xs font-mono uppercase tracking-wider">
+                      What are you working on?
+                    </label>
                     <input
                       type="text"
+                      value={rsvpWork}
+                      onChange={(e) => setRsvpWork(e.target.value)}
                       placeholder="Hydrological research, startup, etc."
-                      className="w-full px-3 py-2 rounded bg-background border border-border text-foreground focus:border-data focus:outline-none"
+                      className="w-full px-3 py-2 rounded bg-background border border-border text-foreground focus:border-data focus:outline-none text-sm"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-3 rounded bg-data text-black font-bold uppercase tracking-wider hover:bg-data/90 transition-colors"
+                    disabled={rsvpSubmitting}
+                    className="w-full py-3 rounded bg-data text-black font-bold uppercase tracking-wider hover:bg-data/90 transition-colors disabled:opacity-50 text-xs"
                   >
-                    Confirm RSVP →
+                    {rsvpSubmitting ? "Confirming Seat..." : "Confirm RSVP →"}
                   </button>
                 </form>
               )}

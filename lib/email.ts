@@ -42,7 +42,7 @@ function inferSmtpHost(username: string): { host: string; port?: number; secure?
  * SMTP_PASSWORD, SMTP_PASS, MAIL_PASSWORD, etc.
  * Auto-detects well-known SMTP providers (like Gmail) if host is omitted.
  */
-export function getMailTransporter() {
+export function getMailTransporter(overridePort?: number, overrideSecure?: boolean) {
   const user =
     process.env.SMTP_USERNAME ||
     process.env.smtp_username ||
@@ -76,7 +76,7 @@ export function getMailTransporter() {
       console.info(`[SMTP] Auto-detected host '${host}' from username '${user}'.`);
     } else {
       console.warn(
-        `[SMTP] Warning: SMTP credentials provided but SMTP_SERVER (or SMTP_HOST) is missing. Set SMTP_SERVER in Railway variables.`
+        `[SMTP] Warning: SMTP credentials provided but SMTP_SERVER (or SMTP_HOST) is missing. Set SMTP_SERVER in Railway or Vercel variables.`
       );
     }
   }
@@ -91,15 +91,19 @@ export function getMailTransporter() {
     process.env.MAIL_PORT ||
     "";
 
-  const port = portEnv
+  const defaultPort = portEnv
     ? parseInt(portEnv, 10)
     : host === "smtp-mail.outlook.com" || host === "smtp.sendgrid.net"
     ? 587
     : 465;
 
+  const port = overridePort !== undefined ? overridePort : defaultPort;
+
   const secureOverride = process.env.SMTP_SECURE || process.env.smtp_secure;
   const secure =
-    secureOverride !== undefined
+    overrideSecure !== undefined
+      ? overrideSecure
+      : secureOverride !== undefined
       ? secureOverride === "true" || secureOverride === "1"
       : port === 465;
 
@@ -110,6 +114,10 @@ export function getMailTransporter() {
     auth: {
       user,
       pass,
+    },
+    tls: {
+      // Allows self-signed certificates or SNI discrepancies on custom domain mail servers
+      rejectUnauthorized: false,
     },
     connectionTimeout: 15000,
     greetingTimeout: 15000,
@@ -210,15 +218,45 @@ Headquarters: Maharajgunj Research Station, Kathmandu Valley (27.7408° N, 85.33
     return { success: true, simulated: true };
   }
 
+  // Helper to send with automatic fallback to alternate port (465 <-> 587) if connection fails
+  const sendWithFallback = async (mailOptions: Parameters<typeof transporter.sendMail>[0]) => {
+    try {
+      return await transporter.sendMail(mailOptions);
+    } catch (primaryError: any) {
+      console.warn("[SMTP] Primary dispatch attempt failed. Checking fallback options...", {
+        message: primaryError?.message,
+        code: primaryError?.code,
+        command: primaryError?.command,
+      });
+
+      // Attempt alternate port if connection/timeout error
+      const currentPort = Number(process.env.SMTP_PORT || process.env.smtp_port || 465);
+      const fallbackPort = currentPort === 465 ? 587 : 465;
+      const fallbackSecure = fallbackPort === 465;
+
+      console.info(`[SMTP] Retrying transmission via fallback port ${fallbackPort} (secure: ${fallbackSecure})...`);
+      const fallbackTransporter = getMailTransporter(fallbackPort, fallbackSecure);
+      if (fallbackTransporter) {
+        return await fallbackTransporter.sendMail(mailOptions);
+      }
+      throw primaryError;
+    }
+  };
+
   // 1. Send notification to Directorate
   try {
-    await transporter.sendMail({
+    const info = await sendWithFallback({
       from: `"Sustainability Lab Intake" <${fromEmail}>`,
       to: directorateEmail,
       replyTo: payload.email,
       subject: `[Intake: ${payload.intent.toUpperCase()}] Project Brief from ${payload.name}`,
       text: emailBodyText,
       html: emailHtml,
+    });
+    console.info("[SMTP] Directorate notification dispatched successfully:", {
+      messageId: info.messageId,
+      accepted: info.accepted,
+      response: info.response,
     });
   } catch (sendError: any) {
     console.error("[SMTP] Failed to send intake notification email:", {
@@ -232,7 +270,7 @@ Headquarters: Maharajgunj Research Station, Kathmandu Valley (27.7408° N, 85.33
 
   // 2. Send acknowledgment to the sender
   try {
-    await transporter.sendMail({
+    await sendWithFallback({
       from: `"The Sustainability Lab Directorate" <${fromEmail}>`,
       to: payload.email,
       subject: `Inquiry Received: Sustainability Lab Directorate Intake`,

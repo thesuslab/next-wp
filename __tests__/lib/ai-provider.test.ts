@@ -146,13 +146,17 @@ Check \`code\` here.`;
     const prompt = buildSystemPrompt(null, "what are the scheduled policy briefs on carbon taxation");
     expect(prompt).toContain("Scheduled Articles & Forward-Looking Analysis");
     expect(prompt).toContain("Scheduled Policy Brief: Himalayan Carbon Taxation 2027");
-    expect(prompt).toContain("SCHEDULED FOR PUBLICATION - 2027-01-15");
+    expect(prompt).toContain("UPCOMING RESEARCH - 2027-01-15");
+    expect(prompt).not.toContain("SCHEDULED FOR PUBLICATION");
+    expect(prompt).not.toContain("EDITORIAL 6:00 AM FEED");
 
     const response = await queryAIProvider([
       { role: "user", content: "tell me about the scheduled policy brief on carbon taxation" },
     ]);
     expect(response.text).toBeTruthy();
     expect(response.text).toContain("Scheduled Policy Brief: Himalayan Carbon Taxation 2027");
+    expect(response.text).not.toContain("SCHEDULED FOR PUBLICATION");
+    expect(response.text).not.toContain("EDITORIAL 6:00 AM FEED");
     // Ensure output is also markdown-free
     expect(response.text).not.toMatch(/\*\*[^*]+\*\*/);
     expect(response.text).not.toMatch(/^#{1,6}\s/m);

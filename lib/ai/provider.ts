@@ -196,22 +196,22 @@ ${activeArticle.body}${dataStr}
   if (matches.length > 0) {
     contextOutput += `### Relevant Verified Knowledge Base, Published & Scheduled Dispatches:
 ${matches
-  .map((art) => {
-    const isScheduled =
-      art.source.type?.toLowerCase().includes("scheduled") ||
-      art.tags?.some((t) => t.toLowerCase().includes("scheduled"));
-    const label = isScheduled
-      ? `• [SCHEDULED FOR PUBLICATION - ${art.source.date}]`
-      : `• [${art.source.level.toUpperCase()}]`;
+        .map((art) => {
+          const isScheduled =
+            art.source.type?.toLowerCase().includes("scheduled") ||
+            art.tags?.some((t) => t.toLowerCase().includes("scheduled"));
+          const label = isScheduled
+            ? `• [UPCOMING RESEARCH - ${art.source.date}]`
+            : `• [${art.source.level.toUpperCase()}]`;
 
-    return `${label} "${art.title}" (${art.source.name}, ${art.source.date}):
+          return `${label} "${art.title}" (${art.source.name}, ${art.source.date}):
   Status: ${isScheduled ? "Scheduled to publish on " + art.source.date : "Published"}
   Summary: ${art.summary}
   Body Extract: ${art.body.slice(0, 1200)}...
   Source Citation: ${art.source.url}
   ${art.data ? `Data: ${JSON.stringify(art.data)}` : ""}`;
-  })
-  .join("\n\n")}`;
+        })
+        .join("\n\n")}`;
   }
 
   return contextOutput.trim();
@@ -440,7 +440,12 @@ export function stripMarkdown(text: string): string {
   cleaned = cleaned.replace(/^(\s*)[*+]\s+/gm, "$1• ");
   cleaned = cleaned.replace(/^(\s*)-\s+/gm, "$1• ");
 
-  // 10. Clean up excessive empty lines
+  // 10. Strip forbidden editorial/scheduled badges if generated
+  cleaned = cleaned.replace(/EDITORIAL 6:00 AM FEED • VERIFIED/gi, "");
+  cleaned = cleaned.replace(/SCHEDULED FOR PUBLICATION • \d{4}-\d{2}-\d{2}/gi, "");
+  cleaned = cleaned.replace(/SCHEDULED FOR PUBLICATION/gi, "Upcoming Research");
+
+  // 11. Clean up excessive empty lines
   cleaned = cleaned.replace(/\n{3,}/g, "\n\n");
 
   return cleaned.trim();
@@ -450,12 +455,6 @@ export function getOutOfScopeResponse(): string {
   return stripMarkdown(`Out of Scope • Sustainable AI Advisor
 
 I am the Sustainability Lab's Sustainable AI Advisor, specialized exclusively in environmental intelligence, Himalayan climate resilience, watershed engineering, and circular craftsmanship.
-
-I can only assist with inquiries related to:
-• Climate Science & Telemetry: Nepal historical baselines, SSP3-7.0 projections, and cryosphere telemetry.
-• Watershed & Engineering: GLOF multi-hazard early warning, Run-of-River hydro safeguarding, and bio-engineering cut-slope stabilization.
-• Circular Design & Craft: Salvaged Shorea robusta (Sal) architectural timber and KĀRVA Studio artifacts.
-• Published Dispatches: Verified institutional reports and field dispatches published across the knowledge base.
 
 Please pose an inquiry related to environmental science, climate adaptation, or Sustainability Lab research.`);
 }
@@ -600,13 +599,12 @@ Evidence Level: ${article.source.level.toUpperCase()} • Region: ${article.regi
 
 2. Context & Analysis:
 ${article.body}
-${
-  article.data
-    ? `\n3. Quantitative Telemetry Metrics:\n${Object.entries(article.data)
-        .map(([k, v]) => `   • ${k}: ${v}`)
-        .join("\n")}`
-    : ""
-}
+${article.data
+          ? `\n3. Quantitative Telemetry Metrics:\n${Object.entries(article.data)
+            .map(([k, v]) => `   • ${k}: ${v}`)
+            .join("\n")}`
+          : ""
+        }
 
 Direct citation verified from official document at ${article.source.url}.`);
     }
@@ -631,12 +629,12 @@ Direct citation verified from official document at ${article.source.url}.`);
   ) {
     return stripMarkdown(`How The Sustainability Lab Can Support You
 
-The Sustainability Lab (Maharajgunj Research Station, Kathmandu Valley: 27.7408° N, 85.3365° E) operates as an interdisciplinary research laboratory, environmental intelligence platform, and circular craftsmanship studio. We bridge scientific research, physical climate engineering, and tangible regenerative products.
+The Sustainability Lab (Maharajgunj, Kathmandu Valley: 27.7408° N, 85.3365° E) operates as an interdisciplinary research laboratory, environmental intelligence platform, and circular craftsmanship studio. We bridge scientific research, physical climate engineering, and tangible regenerative products.
 
 Here is how we can support your work across our operational pillars:
 
 1. Intelligence & Open Knowledge Hub
-• 28+ Verified Evidence Reports: Access our open repository of peer-reviewed syntheses grounded in official multilateral documents (UNFCCC Second NDC, World Bank CCKP, ICIMOD Hindu Kush Himalaya Assessment, WHO, and ADB).
+• Verified Evidence Reports: Access our open repository of peer-reviewed syntheses grounded in official multilateral documents (UNFCCC Second NDC, World Bank CCKP, ICIMOD Hindu Kush Himalaya Assessment, WHO, and ADB).
 • High-Resolution Spatial GIS Telemetry: Explore interactive spatial layers for Himalayan river catchments, glacier retreat zones, and climate vulnerability hotspots.
 • Climate Risk Scanner: Run forward-looking IPCC scenario modeling (SSP3-7.0 / SSP1-2.6) for 2030 and 2050 horizons to evaluate temperature anomalies and extreme precipitation risks for your projects.
 • Explore: /intelligence and /intelligence/knowledge

@@ -119,7 +119,8 @@ describe("Sustainable AI Knowledge Indexer", () => {
 
     // Verify it is grounded in findRelevantKnowledgeContext for AI Advisor
     const context = findRelevantKnowledgeContext("Tell me about scheduled glacier mass balance research");
-    expect(context).toContain("SCHEDULED FOR PUBLICATION");
+    expect(context).toContain("UPCOMING RESEARCH - 2026-12-01");
+    expect(context).not.toContain("SCHEDULED FOR PUBLICATION");
     expect(context).toContain("Scheduled Assessment: Glacier Mass Balance Projections for 2027");
   });
 
@@ -142,7 +143,8 @@ describe("Sustainable AI Knowledge Indexer", () => {
     expect(results[0].title).toBe("Forthcoming Hydropower Siltation Protocol");
 
     const aiContext = findRelevantKnowledgeContext("What are the upcoming hydropower siltation guidelines?");
-    expect(aiContext).toContain("SCHEDULED FOR PUBLICATION - 2026-11-15");
+    expect(aiContext).toContain("UPCOMING RESEARCH - 2026-11-15");
+    expect(aiContext).not.toContain("SCHEDULED FOR PUBLICATION");
     expect(aiContext).toContain("Forthcoming Hydropower Siltation Protocol");
   });
 });
